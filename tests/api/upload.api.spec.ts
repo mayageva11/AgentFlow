@@ -50,3 +50,39 @@ test('one bad row in otherwise valid file — entire file rejected with status 6
 
   expect(result.status).toBe(67);
 });
+
+test('file with invalid category value — returns status 67', async ({ page }) => {
+  // Allowed values: life | health | pension | property. Anything else → 67.
+  await page.route('**/api/upload', route =>
+    route.fulfill({ json: mockData.upload.status67 })
+  );
+
+  const result = await page.evaluate(async () => {
+    const res = await fetch('/api/upload', { method: 'POST' });
+    return res.json();
+  });
+
+  expect(result.status).toBe(67);
+});
+
+test('duplicate file — second upload of identical content returns status 67', async ({
+  page
+}) => {
+  // First upload succeeds (base fixture routes /api/upload → status 50)
+  const first = await page.evaluate(async () => {
+    const res = await fetch('/api/upload', { method: 'POST' });
+    return res.json();
+  });
+  expect(first.status).toBe(50);
+
+  // Server detects the same SHA-256 hash and rejects the second attempt
+  await page.route('**/api/upload', route =>
+    route.fulfill({ json: mockData.upload.status67 })
+  );
+
+  const second = await page.evaluate(async () => {
+    const res = await fetch('/api/upload', { method: 'POST' });
+    return res.json();
+  });
+  expect(second.status).toBe(67);
+});

@@ -85,12 +85,24 @@ These test each API's contract via `page.evaluate()` (so `page.route()` intercep
 
 | File | What it checks |
 |---|---|
-| `upload.api.spec.ts` | Status 50 (valid) · 61 (empty) · 67 (bad format / all-or-nothing) · 70 (bad month) |
+| `upload.api.spec.ts` | Status 50 (valid) · 61 (empty) · 67 (bad format / all-or-nothing / invalid category) · 70 (bad month) · Duplicate detection |
 | `manufacturer.api.spec.ts` | Create returns `MFR-` ID · Unknown ID returns 404 |
 | `report.api.spec.ts` | Create returns `RPT-` ID · Foreign manufacturer returns 403 |
 | `isolation.api.spec.ts` | Agency B cannot read Agency A manufacturer · Agency B cannot create report for Agency A manufacturer |
 
-**25 tests across 4 projects:** Desktop Chrome · Mobile Safari · Tablet Chrome · Data Isolation Security
+**27 tests across 4 projects:** Desktop Chrome · Mobile Safari · Tablet Chrome · Data Isolation Security
+
+---
+
+## Assumptions
+
+- Tenant identity comes from an httpOnly session cookie set at login — `agencyId` is never read from the request body.
+- Only three Excel columns exist (`month`, `policy_id`, `category`). Extra columns in an uploaded file are silently ignored (no status 67).
+- Month validation is strict: only `MM-YYYY` is accepted. Any other format (e.g. `YYYY-MM`, `M-YYYY`) returns status 70.
+- Duplicate detection is byte-level SHA-256 hashing. Two files with identical data but generated separately are treated as two distinct uploads.
+- Session cookies are in-memory only — restarting the server logs everyone out.
+- The dashboard shows records for the logged-in agency only. There is no cross-agency view.
+- The Excel template download UI (`GET /api/upload/template`) exists on the server but is not exercised by the mock UI tests because the assignment mock focuses on the upload and result flow.
 
 ---
 
@@ -154,7 +166,7 @@ docs/
 Every push to `main` runs the full test suite and uploads the Allure report as an artifact. No deployment — tests only.
 
 ```
-push to main → install → generate fixtures → run 26 tests → allure report → upload artifact
+push to main → install → generate fixtures → run 27 tests → allure report → upload artifact
 ```
 
 Download the Allure report from the Actions tab → latest run → Artifacts → `allure-report`.

@@ -25,11 +25,11 @@ QA automation suite for the insurance commission upload flow. Tests cover the fu
 |----|----------|----------|----------|
 | P1-01 | File with one bad row among valid rows — entire file rejected | Status 67 (all-or-nothing) | `upload.api.spec.ts` |
 | P1-02 | File with a row whose category is not in allowed set | Status 67 (bad format) | `upload.api.spec.ts` |
-| P1-03 | Upload same file twice (byte-identical) | Second upload returns non-50 | `fullFlow.e2e.spec.ts` |
-| P1-04 | Manufacturer created by agency A not accessible by agency B | GET returns 404 | `upload.api.spec.ts`, `manufacturer.e2e.spec.ts` |
-| P1-05 | Create manufacturer via UI — ID appears in response | Creator sees ID | `manufacturer.e2e.spec.ts` |
-| P1-06 | Create report linked to manufacturer — branch and category saved | Response contains ID | `report.e2e.spec.ts` |
-| P1-07 | Download Excel template — file contains correct column headers | Headers: month, policy_id, category | `report.e2e.spec.ts` |
+| P1-03 | Upload same file twice (byte-identical) | Second upload returns status 67 | `upload.api.spec.ts` |
+| P1-04 | Manufacturer created by agency A not accessible by agency B | GET returns 404 | `isolation.api.spec.ts` |
+| P1-05 | Create manufacturer — ID appears in response with MFR- prefix | Creator sees ID | `manufacturer.api.spec.ts` |
+| P1-06 | Create report linked to manufacturer — response contains RPT- ID | Response contains ID | `report.api.spec.ts` |
+| P1-07 | Download Excel template — file contains correct column headers | Headers: month, policy_id, category | endpoint exists (`GET /api/upload/template`); no UI in mock |
 | P1-08 | Upload invalid file via UI — correct error code displayed | Error status shown in UI | `fullFlow.e2e.spec.ts` |
 
 ---
