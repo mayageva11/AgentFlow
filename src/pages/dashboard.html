@@ -58,7 +58,10 @@
       gap: 16px;
     }
 
-    .brand { display: flex; align-items: baseline; gap: 8px; flex-shrink: 0; }
+    .brand {
+      display: flex; align-items: baseline; gap: 8px; flex-shrink: 0;
+      text-decoration: none;
+    }
     .logo {
       font-family: 'JetBrains Mono', monospace;
       font-size: 16px; color: var(--teal); letter-spacing: .05em;
@@ -85,6 +88,15 @@
     }
     nav a:hover  { color: var(--text);  background: rgba(255,255,255,.04); }
     nav a.active { color: var(--teal);  font-weight: 600; }
+
+    /* ── demo banner ───────────────────────────────────────── */
+    #demo-banner {
+      display: none;
+      background: var(--teal-lo);
+      border-bottom: 1px solid rgba(0,207,200,.18);
+      padding: 8px 24px;
+      font-size: 12px; color: var(--teal); text-align: center;
+    }
 
     /* ── main ──────────────────────────────────────────────── */
     main {
@@ -135,6 +147,16 @@
       margin-bottom: 24px;
     }
 
+    /* ── empty state ───────────────────────────────────────── */
+    #empty-state {
+      display: none;
+      text-align: center;
+      padding: 72px 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    #empty-state strong { display: block; font-size: 16px; color: var(--text); margin-bottom: 8px; }
+
     /* ── reports table ─────────────────────────────────────── */
     #reports-table { display: none; }
 
@@ -166,17 +188,21 @@
       color: var(--muted); text-transform: uppercase; letter-spacing: .07em;
       white-space: nowrap;
     }
+    th.num { text-align: right; }
+
     td {
       padding: 13px 16px;
       border-top: 1px solid var(--border);
       color: var(--text);
       vertical-align: middle;
     }
-    tbody tr:hover { background: rgba(255,255,255,.018); }
+    tbody tr:hover { background: rgba(0,207,200,.04); }
 
-    td:first-child {
+    td.num {
+      text-align: right;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px; color: var(--teal);
+      font-size: 12px;
+      color: var(--text);
     }
 
     .badge {
@@ -184,6 +210,7 @@
       font-size: 11px; font-weight: 600;
       padding: 3px 10px; border-radius: 20px;
       text-transform: uppercase; letter-spacing: .04em;
+      white-space: nowrap;
     }
     .badge-ok      { background: var(--ok-bg);   color: var(--ok-fg);   }
     .badge-pending { background: var(--warn-bg);  color: var(--warn-fg); }
@@ -205,14 +232,15 @@
       td {
         display: flex; justify-content: space-between; align-items: center;
         padding: 4px 0; border: none; font-size: 12px;
+        text-align: left;
       }
+      td.num { text-align: left; }
       td::before {
         content: attr(data-label);
         font-size: 10px; font-weight: 600;
         color: var(--muted); text-transform: uppercase;
         letter-spacing: .06em; flex-shrink: 0; margin-right: 8px;
       }
-      td:first-child { color: var(--teal); }
     }
 
     @media (max-width: 480px) {
@@ -224,10 +252,10 @@
   <div class="pulse-bar"></div>
 
   <header>
-    <div class="brand">
+    <a class="brand" href="/dashboard" id="home-link">
       <span class="logo">AgentFlow</span>
       <span class="brand-tag">Hub</span>
-    </div>
+    </a>
 
     <div class="header-center">
       <div class="claude-badge" id="claude-badge">🤖 Initialising…</div>
@@ -239,6 +267,10 @@
       <a href="/downloads">Upload &amp; Templates</a>
     </nav>
   </header>
+
+  <div id="demo-banner">
+    ✦ Static Demo Mode — pre-generated Claude API data &nbsp;·&nbsp; GitHub Pages deployment
+  </div>
 
   <main>
     <div class="page-header">
@@ -253,6 +285,11 @@
 
     <div id="dashboard-error">Error: Enterprise API Connection Failure (500)</div>
 
+    <div id="empty-state">
+      <strong>No records found</strong>
+      No commission reports available for this period.
+    </div>
+
     <div id="reports-table">
       <div class="table-wrapper">
         <div class="table-meta">
@@ -266,8 +303,8 @@
                 <th>Insurer</th>
                 <th>Month</th>
                 <th>Category</th>
-                <th>Commission (₪)</th>
-                <th>Policies</th>
+                <th class="num">Commission (₪)</th>
+                <th class="num">Policies</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -288,16 +325,17 @@
       '/downloads': isGitHubPages ? './downloads.html' : '/downloads',
     };
 
-    document.querySelectorAll('nav a[href]').forEach(function(a) {
+    document.querySelectorAll('nav a[href], #home-link').forEach(function(a) {
       var k = a.getAttribute('href');
       if (NAV[k]) a.href = NAV[k];
     });
 
-    document.getElementById('claude-badge').textContent = isGitHubPages
-      ? '🤖 Static Demo Sandbox'
-      : '🤖 Live Server Core Active';
+    if (isGitHubPages) {
+      document.getElementById('home-link').href = './index.html';
+      document.getElementById('demo-banner').style.display = 'block';
+    }
 
-    // ── demo data ────────────────────────────────────────────
+    // ── demo fallback data ───────────────────────────────────
     var DEMO_REPORTS = [
       { manufacturer: 'מנורה מבטחים',  month: '06-2025', category: 'life',     totalCommission: 128400, policyCount: 87,  status: 'processed' },
       { manufacturer: 'הפניקס ביטוח',  month: '06-2025', category: 'health',   totalCommission: 94250,  policyCount: 63,  status: 'processed' },
@@ -306,37 +344,77 @@
       { manufacturer: 'כלל ביטוח',     month: '04-2025', category: 'life',     totalCommission: 154600, policyCount: 103, status: 'processed' },
     ];
 
+    // ── formatters ───────────────────────────────────────────
+    var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    function fmtMonth(m) {
+      var parts = (m || '').split('-');
+      if (parts.length !== 2) return m || '—';
+      var idx = parseInt(parts[0], 10) - 1;
+      return (MONTHS[idx] || parts[0]) + ' ' + parts[1];
+    }
+
+    function capitalize(s) {
+      return s ? s.charAt(0).toUpperCase() + s.slice(1) : '—';
+    }
+
     // ── row renderer ─────────────────────────────────────────
     function renderRow(r) {
       var tr = document.createElement('tr');
       var statusMap = { processed: 'badge-ok', pending: 'badge-pending', error: 'badge-error' };
       var cls = statusMap[r.status] || 'badge-pending';
       tr.innerHTML =
-        '<td data-label="Insurer">'     + (r.manufacturer || '—')                             + '</td>' +
-        '<td data-label="Month">'       + (r.month || '—')                                    + '</td>' +
-        '<td data-label="Category">'    + (r.category || '—')                                 + '</td>' +
-        '<td data-label="Commission">₪' + Number(r.totalCommission || 0).toLocaleString()    + '</td>' +
-        '<td data-label="Policies">'    + (r.policyCount || 0)                                + '</td>' +
-        '<td data-label="Status"><span class="badge ' + cls + '">' + (r.status || '—') + '</span></td>';
+        '<td data-label="Insurer">'                                     + (r.manufacturer || '—')                         + '</td>' +
+        '<td data-label="Month">'                                       + fmtMonth(r.month)                               + '</td>' +
+        '<td data-label="Category">'                                    + capitalize(r.category)                          + '</td>' +
+        '<td data-label="Commission" class="num">₪'                    + Number(r.totalCommission || 0).toLocaleString() + '</td>' +
+        '<td data-label="Policies" class="num">'                        + (r.policyCount || 0)                            + '</td>' +
+        '<td data-label="Status"><span class="badge ' + cls + '">'     + capitalize(r.status)                            + '</span></td>';
       return tr;
+    }
+
+    function showRows(rows, badgeText) {
+      var bodyEl  = document.getElementById('reports-body');
+      var countEl = document.getElementById('row-count');
+      var tableEl = document.getElementById('reports-table');
+      var emptyEl = document.getElementById('empty-state');
+
+      document.getElementById('claude-badge').textContent = badgeText;
+
+      if (!rows || rows.length === 0) {
+        emptyEl.style.display = 'block';
+        return;
+      }
+
+      rows.forEach(function(r) { bodyEl.appendChild(renderRow(r)); });
+      countEl.textContent     = rows.length + ' record' + (rows.length === 1 ? '' : 's');
+      tableEl.style.display   = 'block';
     }
 
     // ── loader ───────────────────────────────────────────────
     async function loadReports() {
       var loadingEl = document.getElementById('loading');
       var errorEl   = document.getElementById('dashboard-error');
-      var tableEl   = document.getElementById('reports-table');
-      var bodyEl    = document.getElementById('reports-body');
-      var countEl   = document.getElementById('row-count');
 
       loadingEl.style.display = 'flex';
       errorEl.style.display   = 'none';
-      tableEl.style.display   = 'none';
 
       if (isGitHubPages) {
-        DEMO_REPORTS.forEach(function(r) { bodyEl.appendChild(renderRow(r)); });
-        countEl.textContent     = DEMO_REPORTS.length + ' records';
-        tableEl.style.display   = 'block';
+        // Try pre-generated Claude API data first, fall back to inline demo data
+        try {
+          var res = await fetch('./data/dashboard.json');
+          if (!res.ok) throw new Error('no data file');
+          var data = await res.json();
+          var rows = Array.isArray(data) && data.length > 0 ? data : null;
+          if (rows) {
+            showRows(rows, '🤖 Claude API — Pre-generated');
+            loadingEl.style.display = 'none';
+            return;
+          }
+        } catch (_) {
+          // fall through to DEMO_REPORTS
+        }
+        showRows(DEMO_REPORTS, '🤖 Static Demo Sandbox');
         loadingEl.style.display = 'none';
         return;
       }
@@ -346,10 +424,9 @@
         if (!res.ok) throw new Error(String(res.status));
         var data = await res.json();
         var rows = Array.isArray(data) && data.length > 0 ? data : DEMO_REPORTS;
-        rows.forEach(function(r) { bodyEl.appendChild(renderRow(r)); });
-        countEl.textContent   = rows.length + ' records';
-        tableEl.style.display = 'block';
+        showRows(rows, '🤖 Live Server Core Active');
       } catch (_) {
+        document.getElementById('claude-badge').textContent = '🤖 Live Server Core Active';
         errorEl.style.display = 'block';
       } finally {
         loadingEl.style.display = 'none';
