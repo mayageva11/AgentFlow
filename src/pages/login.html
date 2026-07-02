@@ -64,15 +64,6 @@
     nav a:hover  { color: var(--text); background: rgba(255,255,255,.04); }
     nav a.active { color: var(--teal); font-weight: 600; }
 
-    /* demo banner */
-    #demo-banner {
-      display: none;
-      background: var(--teal-lo);
-      border-bottom: 1px solid rgba(0,207,200,.18);
-      padding: 8px 24px;
-      font-size: 12px; color: var(--teal); text-align: center;
-    }
-
     .page-center {
       flex: 1; display: flex;
       align-items: center; justify-content: center;
@@ -137,7 +128,6 @@
       text-align: center; margin-top: 12px; min-height: 18px;
     }
 
-    /* ── demo credentials ──────────────────────────────────── */
     .demo-section {
       margin-top: 28px;
       border-top: 1px solid var(--border);
@@ -204,20 +194,15 @@
   <div class="pulse-bar"></div>
 
   <header>
-    <a class="brand" href="/login" id="home-link">
+    <a class="brand" href="/dashboard">
       <span class="logo">AgentFlow</span>
       <span class="brand-tag">Hub</span>
     </a>
     <nav>
       <a href="/login" class="active">Login</a>
       <a href="/dashboard">Dashboard</a>
-      <a href="/downloads">Upload &amp; Templates</a>
     </nav>
   </header>
-
-  <div id="demo-banner">
-    ✦ Static Demo Mode — any credentials accepted &nbsp;·&nbsp; GitHub Pages
-  </div>
 
   <div class="page-center">
     <div class="auth-card">
@@ -226,22 +211,26 @@
 
       <form id="login-form">
         <label for="email">Email address</label>
-        <input id="email" name="email" type="email"
+        <input
+          data-testid="login-email"
+          id="email" name="email" type="email"
           placeholder="agent@example.com"
           autocomplete="email" required />
 
         <label for="password">Password</label>
-        <input id="password" name="password" type="password"
+        <input
+          data-testid="login-password"
+          id="password" name="password" type="password"
           placeholder="••••••••"
           autocomplete="current-password" required />
 
-        <button type="submit">Sign in</button>
+        <button data-testid="login-submit" type="submit">Sign in</button>
       </form>
 
       <div id="error-msg"></div>
 
       <div class="demo-section">
-        <div class="demo-label">Demo accounts — click to use</div>
+        <div class="demo-label">Demo accounts — click to fill</div>
 
         <div class="demo-user" data-email="agency-a@agentflow.dev" data-password="Test1234!">
           <div class="demo-user-info">
@@ -263,24 +252,6 @@
   </div>
 
   <script>
-    const isGitHubPages = window.location.hostname.includes('github.io');
-
-    const NAV = {
-      '/login':     isGitHubPages ? './login.html'     : '/login',
-      '/dashboard': isGitHubPages ? './dashboard.html' : '/dashboard',
-      '/downloads': isGitHubPages ? './downloads.html' : '/downloads',
-    };
-
-    document.querySelectorAll('nav a[href], #home-link').forEach(function(a) {
-      var k = a.getAttribute('href');
-      if (NAV[k]) a.href = NAV[k];
-    });
-
-    if (isGitHubPages) {
-      document.getElementById('demo-banner').style.display = 'block';
-    }
-
-    // click-to-fill demo credentials
     document.querySelectorAll('.demo-user').forEach(function(el) {
       el.addEventListener('click', function() {
         document.getElementById('email').value    = el.dataset.email;
@@ -291,24 +262,23 @@
 
     document.getElementById('login-form').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const email    = document.querySelector('[name="email"]').value;
-      const password = document.querySelector('[name="password"]').value;
+      var email    = document.getElementById('email').value;
+      var password = document.getElementById('password').value;
 
-      if (isGitHubPages) {
-        window.location.href = NAV['/dashboard'];
-        return;
-      }
+      try {
+        var res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
 
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (res.ok) {
-        window.location.href = '/dashboard';
-      } else {
-        document.getElementById('error-msg').textContent = 'Invalid credentials. Please try again.';
+        if (res.ok) {
+          window.location.href = '/dashboard';
+        } else {
+          document.getElementById('error-msg').textContent = 'Invalid credentials. Please try again.';
+        }
+      } catch (_) {
+        document.getElementById('error-msg').textContent = 'Network error. Is the server running?';
       }
     });
   </script>

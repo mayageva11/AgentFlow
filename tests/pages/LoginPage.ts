@@ -7,9 +7,9 @@ export class LoginPage {
   readonly errorMessage: Locator;
 
   constructor(private readonly page: Page) {
-    this.emailInput    = page.locator('[name="email"]');
-    this.passwordInput = page.locator('[name="password"]');
-    this.submitButton  = page.locator('[type="submit"]');
+    this.emailInput    = page.locator('[data-testid="login-email"]');
+    this.passwordInput = page.locator('[data-testid="login-password"]');
+    this.submitButton  = page.locator('[data-testid="login-submit"]');
     this.errorMessage  = page.locator('#error-msg');
   }
 

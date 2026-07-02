@@ -27,7 +27,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: '.auth/agency-a.json',
       },
-      testIgnore: '**/isolation.spec.ts',
+      testIgnore: '**/api/isolation.api.spec.ts',
     },
     {
       name: 'Mobile Safari',
@@ -60,7 +60,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: '.auth/agency-b.json',
       },
-      testMatch: '**/e2e/isolation.spec.ts',
+      testMatch: '**/api/isolation.api.spec.ts',
     },
   ],
 });

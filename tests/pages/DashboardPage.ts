@@ -5,7 +5,6 @@ export class DashboardPage {
   readonly nav: Locator;
   readonly navLinks: Locator;
   readonly heading: Locator;
-  readonly claudeBadge: Locator;
   readonly loadingIndicator: Locator;
   readonly dashboardError: Locator;
   readonly reportsTable: Locator;
@@ -15,10 +14,9 @@ export class DashboardPage {
     this.nav              = page.locator('nav');
     this.navLinks         = page.locator('nav a');
     this.heading          = page.locator('h1');
-    this.claudeBadge      = page.locator('.claude-badge');
     this.loadingIndicator = page.locator('#loading');
-    this.dashboardError   = page.locator('#dashboard-error');
-    this.reportsTable     = page.locator('#reports-table');
+    this.dashboardError   = page.locator('[data-testid="error-message"]');
+    this.reportsTable     = page.locator('[data-testid="dashboard-table"]');
   }
 
   async navigate(): Promise<void> {
@@ -32,9 +30,8 @@ export class DashboardPage {
     );
   }
 
-  /** Returns a locator scoped to the table row that contains the given manufacturer name. */
   getRowLocator(manufacturer: string): Locator {
-    return this.reportsTable.locator('tr').filter({ hasText: manufacturer });
+    return this.page.locator('[data-testid="dashboard-row"]').filter({ hasText: manufacturer });
   }
 
   async fitsViewport(): Promise<boolean> {

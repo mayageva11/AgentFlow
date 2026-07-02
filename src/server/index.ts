@@ -20,7 +20,6 @@ app.get('/health', (_req, res) => res.json({ ok: true }));
 
 app.get('/login',     (_req, res) => res.sendFile(path.join(PAGES, 'login.html')));
 app.get('/dashboard', (_req, res) => res.sendFile(path.join(PAGES, 'dashboard.html')));
-app.get('/downloads', (_req, res) => res.sendFile(path.join(PAGES, 'downloads.html')));
 
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;

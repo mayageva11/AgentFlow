@@ -42,12 +42,6 @@ jobs:
           CI: true
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
-      - name: Generate static dashboard data
-        if: always()
-        run: npm run generate:dashboard
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-
       - name: Generate Allure report
         if: always()
         run: |
@@ -60,15 +54,10 @@ jobs:
         run: |
           mkdir -p gh-pages/report
           cp -r allure-report/. gh-pages/report/
-          cp src/pages/landing.html   gh-pages/index.html
           cp src/pages/login.html     gh-pages/login.html
           cp src/pages/dashboard.html gh-pages/dashboard.html
-          cp src/pages/downloads.html gh-pages/downloads.html
-          if [ -f dist/static/dashboard.json ]; then
-            mkdir -p gh-pages/data
-            cp dist/static/dashboard.json gh-pages/data/dashboard.json
-          fi
           touch gh-pages/.nojekyll
+          printf '<meta http-equiv="refresh" content="0;url=./report/index.html" />\n' > gh-pages/index.html
 
       - name: Upload Allure artifact
         if: always()
