@@ -283,11 +283,25 @@
     }
 
     async function loadReports() {
-      const res = await fetch('/api/dashboard');
-      const reports = await res.json();
-      document.getElementById('reports-body').innerHTML = reports.map(renderRow).join('');
+      let reports = [];
+
+      // Try live backend first; fall back to pre-generated static data (GitHub Pages)
+      try {
+        const res = await fetch('/api/dashboard');
+        if (!res.ok) throw new Error('no backend');
+        reports = await res.json();
+      } catch {
+        try {
+          const res = await fetch('./data/dashboard.json');
+          if (res.ok) reports = await res.json();
+        } catch { /* leave empty */ }
+      }
+
       document.getElementById('loading').style.display = 'none';
-      document.getElementById('reports-table').style.display = 'table';
+      if (reports.length > 0) {
+        document.getElementById('reports-body').innerHTML = reports.map(renderRow).join('');
+        document.getElementById('reports-table').style.display = 'table';
+      }
     }
 
     loadReports();

@@ -242,51 +242,70 @@
 
   </main>
   <script>
+    const DEMO_MSG = 'Backend not running — start the server locally for live interactions (npm run server)';
+
     document.getElementById('create-manufacturer-btn').addEventListener('click', async () => {
+      const el = document.getElementById('manufacturer-result');
       const name      = document.getElementById('manufacturer-name').value;
       const iconColor = document.getElementById('manufacturer-color').value;
-      const res = await fetch('/api/manufacturer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, iconColor }),
-      });
-      const data = await res.json();
-      const el = document.getElementById('manufacturer-result');
-      el.textContent = `Created — ID: ${data.id}`;
-      el.className = 'result';
+      try {
+        const res = await fetch('/api/manufacturer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, iconColor }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        el.textContent = `Created — ID: ${data.id}`;
+        el.className = 'result';
+      } catch {
+        el.textContent = DEMO_MSG;
+        el.className = 'result error';
+      }
     });
 
     document.getElementById('create-report-btn').addEventListener('click', async () => {
+      const el             = document.getElementById('report-result');
       const manufacturerId = document.getElementById('report-manufacturer-id').value;
       const branch         = document.getElementById('report-branch').value;
       const name           = document.getElementById('report-name').value;
       const category       = document.getElementById('report-category').value;
-      const res = await fetch('/api/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ manufacturerId, branch, name, category }),
-      });
-      const data = await res.json();
-      const el = document.getElementById('report-result');
-      if (res.ok) {
+      try {
+        const res = await fetch('/api/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ manufacturerId, branch, name, category }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+        const data = await res.json();
         el.textContent = `Created — ID: ${data.id}`;
         el.className = 'result';
-      } else {
-        el.textContent = `Error: ${data.error}`;
+      } catch (err) {
+        const msg = (err instanceof Error && err.message !== 'Failed to fetch') ? `Error: ${err.message}` : DEMO_MSG;
+        el.textContent = msg;
         el.className = 'result error';
       }
     });
 
     document.getElementById('upload-btn').addEventListener('click', async () => {
+      const el   = document.getElementById('upload-result');
       const file = document.getElementById('upload-file').files[0];
       if (!file) return;
       const form = new FormData();
       form.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: form });
-      const data = await res.json();
-      const el = document.getElementById('upload-result');
-      el.textContent = `Status: ${data.status}`;
-      el.className = data.status === 50 ? 'result' : 'result error';
+      try {
+        const res  = await fetch('/api/upload', { method: 'POST', body: form });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        el.textContent = `Status: ${data.status}`;
+        el.className = data.status === 50 ? 'result' : 'result error';
+      } catch {
+        el.textContent = DEMO_MSG;
+        el.className = 'result error';
+      }
     });
   </script>
 </body>

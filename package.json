@@ -5,6 +5,7 @@
   "scripts": {
     "server": "ts-node src/server/index.ts",
     "generate:fixtures": "ts-node scripts/generateFixtures.ts",
+    "generate:dashboard": "ts-node scripts/generateStaticDashboard.ts",
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:report": "playwright show-report"
