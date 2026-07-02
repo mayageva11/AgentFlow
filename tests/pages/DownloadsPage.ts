@@ -68,7 +68,7 @@ export class DownloadsPage {
   }
 
   async fillReportBranch(branch: string): Promise<void> {
-    await this.reportBranchInput.fill(branch);
+    await this.reportBranchInput.selectOption(branch);
   }
 
   async fillReportName(name: string): Promise<void> {

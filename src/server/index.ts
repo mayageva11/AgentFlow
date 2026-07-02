@@ -33,14 +33,13 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-app.get('/api/dashboard', async (_req, res) => {
-  try {
-    const { fetchDashboardReports } = await import('../claude/dashboardData');
-    const reports = await fetchDashboardReports();
-    res.json(reports);
-  } catch {
-    res.json([]);
-  }
+app.get('/api/dashboard', (_req, res) => {
+  const { manufacturers, reports, uploadHistory } = require('./state') as typeof import('./state');
+  res.json({
+    manufacturers: manufacturers.size,
+    reports:       reports.size,
+    uploads:       uploadHistory.slice(0, 10),
+  });
 });
 
 app.use('/api/manufacturer', manufacturerRouter);

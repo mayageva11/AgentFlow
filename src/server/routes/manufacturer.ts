@@ -1,23 +1,14 @@
 import { Router, Request, Response } from 'express';
-import { ManufacturerData } from '../types';
 import { getAgencyId } from '../utils/session';
+import { manufacturers, StoredManufacturer } from '../state';
 
 const router = Router();
 
-type Manufacturer = ManufacturerData & { id: string; agencyId: string };
-const manufacturers = new Map<string, Manufacturer>();
-
 function generateId(): string {
-  return Math.random().toString(36).slice(2, 10);
+  return 'MFR-' + Math.random().toString(36).slice(2, 10).toUpperCase();
 }
 
-function saveManufacturer(data: ManufacturerData, agencyId: string): string {
-  const id = generateId();
-  manufacturers.set(id, { ...data, id, agencyId });
-  return id;
-}
-
-export function getManufacturer(id: string, agencyId: string): Manufacturer | null {
+export function getManufacturer(id: string, agencyId: string): StoredManufacturer | null {
   const m = manufacturers.get(id);
   return m?.agencyId === agencyId ? m : null;
 }
@@ -25,17 +16,18 @@ export function getManufacturer(id: string, agencyId: string): Manufacturer | nu
 router.post('/', (req: Request, res: Response) => {
   const agencyId = getAgencyId(req);
   if (!agencyId) { res.status(401).json({ error: 'Unauthorized' }); return; }
-  const { name, iconColor } = req.body;
-  const id = saveManufacturer({ name, iconColor }, agencyId);
+  const { name, iconColor } = req.body as { name: string; iconColor: string };
+  const id = generateId();
+  manufacturers.set(id, { id, name, iconColor, agencyId });
   res.json({ id });
 });
 
 router.get('/:id', (req: Request, res: Response) => {
   const agencyId = getAgencyId(req);
   if (!agencyId) { res.status(401).json({ error: 'Unauthorized' }); return; }
-  const manufacturer = getManufacturer(req.params.id, agencyId);
-  if (!manufacturer) { res.status(404).json({ error: 'Not found' }); return; }
-  res.json(manufacturer);
+  const m = getManufacturer(req.params.id, agencyId);
+  if (!m) { res.status(404).json({ error: 'Not found' }); return; }
+  res.json(m);
 });
 
 export default router;

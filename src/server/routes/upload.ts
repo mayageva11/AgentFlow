@@ -5,6 +5,8 @@ import crypto from 'crypto';
 import { Row } from '../types';
 import { isFileEmpty } from '../validators/fileValidator';
 import { validateRow } from '../validators/rowValidator';
+import { uploadHistory } from '../state';
+import { getAgencyId } from '../utils/session';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -44,6 +46,18 @@ function buildTemplateWorkbook(): XLSX.WorkBook {
   return wb;
 }
 
+function recordUpload(filename: string, status: number, rowCount: number, agencyId: string): void {
+  uploadHistory.unshift({
+    id:       crypto.randomUUID(),
+    filename,
+    status,
+    rowCount,
+    ts:       new Date().toISOString(),
+    agencyId,
+  });
+  if (uploadHistory.length > 50) uploadHistory.pop();
+}
+
 router.get('/template', (_req: Request, res: Response) => {
   const wb = buildTemplateWorkbook();
   const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
@@ -53,21 +67,32 @@ router.get('/template', (_req: Request, res: Response) => {
 });
 
 router.post('/', upload.single('file'), (req: Request, res: Response) => {
-  const buffer = req.file!.buffer;
+  const agencyId = getAgencyId(req) ?? 'unknown';
+  const buffer   = req.file!.buffer;
+  const filename = req.file!.originalname;
+
   if (isDuplicate(buffer)) {
+    recordUpload(filename, 67, 0, agencyId);
     res.json({ status: 67 });
     return;
   }
+
   const rows = parseExcel(buffer);
+
   if (isFileEmpty(rows)) {
+    recordUpload(filename, 61, 0, agencyId);
     res.json({ status: 61 });
     return;
   }
+
   const error = findFirstInvalidRow(rows);
   if (error) {
+    recordUpload(filename, error.statusCode, rows.length, agencyId);
     res.json({ status: error.statusCode });
     return;
   }
+
+  recordUpload(filename, 50, rows.length, agencyId);
   res.json({ status: 50 });
 });
 

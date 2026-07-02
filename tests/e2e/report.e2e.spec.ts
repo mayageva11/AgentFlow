@@ -12,7 +12,7 @@ test('create report under manufacturer — correct branch and category saved', a
 
   // Act
   await downloadsPage.fillReportManufacturerId(manufacturerId);
-  await downloadsPage.fillReportBranch('South');
+  await downloadsPage.fillReportBranch('Elementary');
   await downloadsPage.fillReportName('Audit Q2');
   await downloadsPage.fillReportCategory('health');
   await downloadsPage.clickCreateReport();
