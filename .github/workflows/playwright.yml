@@ -7,16 +7,11 @@ on:
     branches: [main]
 
 jobs:
+  # ── Job 1: install, test, build ──────────────────────────────────────────
   test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
 
     steps:
       - name: Checkout
@@ -37,7 +32,7 @@ jobs:
       - name: Generate fixtures
         run: npm run generate:fixtures
 
-      # webServer in playwright.config.ts manages server lifecycle automatically
+      # webServer in playwright.config.ts manages the Express server lifecycle
       - name: Run tests
         run: npm test
         env:
@@ -87,7 +82,19 @@ jobs:
         with:
           path: ./gh-pages
 
+  # ── Job 2: deploy to GitHub Pages (main branch only) ─────────────────────
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
       - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         id: deploy
         uses: actions/deploy-pages@v4
