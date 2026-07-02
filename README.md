@@ -74,6 +74,8 @@ docs/              test-plan.md
 
 ## Smart Architectural Decisions
 
+- **Dual-Layer Mocking Strategy** — Demonstrates both backend dynamic generation (via Claude API at CI build time) and frontend isolation testing using Playwright's native `page.route()`. Tests intercept, stub, and simulate edge-case network states (including 500 internal server errors) entirely at the browser layer — no database mutation, no backend coordination. See `tests/e2e/networkMocking.spec.ts`.
+
 - **Page Object Model (POM) + Playwright Custom Fixtures (DI)** — Every UI selector and interaction lives in a dedicated page class (`LoginPage`, `DashboardPage`, `DownloadsPage`) under `tests/pages/`. These objects are injected into tests automatically via `tests/fixtures/testBase.ts`, which extends Playwright's base `test` with typed fixtures. Spec files contain zero raw locators — only clean, semantic method calls (`downloadsPage.uploadExcelFile(...)`, `downloadsPage.assertUploadStatus('50')`). A single selector change in a page class fixes every test that uses it.
 
 - **Strict multi-tenant isolation** — `agencyId` is never trusted from the client. The Express server reads it exclusively from a server-set httpOnly cookie (`session`). Isolation is verified by a dedicated `Data Isolation Security` Playwright project that cross-checks agency-A resources from an agency-B session context.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AgentFlow — Login</title>
+  <title>AgentFlow — Insurance Platform Hub | Login</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -26,9 +26,6 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
     }
 
     .pulse-bar {
@@ -37,11 +34,62 @@
       height: 2px;
       background: var(--teal);
       animation: pulse 2s ease-in-out infinite;
+      z-index: 100;
     }
 
     @keyframes pulse {
       0%, 100% { opacity: 0.4; box-shadow: 0 0 4px var(--teal); }
       50%       { opacity: 1;   box-shadow: 0 0 16px var(--teal), 0 0 32px var(--teal); }
+    }
+
+    /* ── Navigation ─────────────────────────────────────────── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand { display: flex; align-items: baseline; gap: 10px; }
+
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      color: var(--teal);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    nav { display: flex; flex-wrap: wrap; gap: 4px; }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      margin-left: 20px;
+      padding: 6px 0;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+
+    nav a:hover  { color: var(--teal); }
+    nav a.active { color: var(--teal); font-weight: 500; }
+
+    /* ── Page content ───────────────────────────────────────── */
+    .page-center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
     }
 
     .card {
@@ -53,17 +101,14 @@
       max-width: 420px;
     }
 
-    .logo {
+    .card-title {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 22px;
+      font-size: 15px;
       color: var(--teal);
-      text-align: center;
-      margin-bottom: 8px;
-      letter-spacing: 0.04em;
+      margin-bottom: 6px;
     }
 
-    .subtitle {
-      text-align: center;
+    .card-subtitle {
       color: var(--muted);
       font-size: 13px;
       margin-bottom: 36px;
@@ -121,28 +166,53 @@
     }
 
     /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 20px;
+      }
+
+      nav a:first-child { margin-left: 0; }
+    }
+
     @media (max-width: 480px) {
-      body { justify-content: flex-start; padding-top: 48px; }
       .card { padding: 32px 20px; border-radius: 10px; }
-      .logo { font-size: 18px; }
       input { font-size: 16px; /* prevents iOS zoom */ }
     }
   </style>
 </head>
 <body>
   <div class="pulse-bar"></div>
-  <div class="card">
-    <div class="logo">AgentFlow</div>
-    <div class="subtitle">Insurance Commission Platform</div>
-    <form id="login-form">
-      <label for="email">Email</label>
-      <input id="email" name="email" type="email" autocomplete="email" required />
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" required />
-      <button type="submit">Sign In</button>
-    </form>
-    <div id="error-msg"></div>
+
+  <header>
+    <div class="brand">
+      <span class="logo">AgentFlow</span>
+      <span class="brand-tag">Insurance Platform Hub</span>
+    </div>
+    <nav>
+      <a href="/login" class="active">Login</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/downloads">Downloads</a>
+    </nav>
+  </header>
+
+  <div class="page-center">
+    <div class="card">
+      <div class="card-title">Sign In</div>
+      <div class="card-subtitle">Enter your agency credentials to continue</div>
+      <form id="login-form">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" required />
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <button type="submit">Sign In</button>
+      </form>
+      <div id="error-msg"></div>
+    </div>
   </div>
+
   <script>
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();

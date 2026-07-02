@@ -56,7 +56,16 @@
       white-space: nowrap;
     }
 
-    nav { display: flex; flex-wrap: wrap; }
+    .brand { display: flex; align-items: baseline; gap: 10px; }
+
+    .brand-tag {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    nav { display: flex; flex-wrap: wrap; gap: 4px; }
 
     nav a {
       color: var(--muted);
@@ -68,7 +77,8 @@
       white-space: nowrap;
     }
 
-    nav a:hover { color: var(--teal); }
+    nav a:hover  { color: var(--teal); }
+    nav a.active { color: var(--teal); font-weight: 500; }
 
     /* ── Main ───────────────────────────────────────────────── */
     main {
@@ -190,10 +200,14 @@
 <body>
   <div class="pulse-bar"></div>
   <header>
-    <span class="logo">AgentFlow</span>
+    <div class="brand">
+      <span class="logo">AgentFlow</span>
+      <span class="brand-tag">Insurance Platform Hub</span>
+    </div>
     <nav>
+      <a href="/login">Login</a>
       <a href="/dashboard">Dashboard</a>
-      <a href="/downloads">Downloads</a>
+      <a href="/downloads" class="active">Downloads</a>
     </nav>
   </header>
   <main>

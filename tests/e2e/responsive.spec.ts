@@ -38,6 +38,6 @@ test('nav links remain present in the DOM on any viewport', async ({ dashboardPa
   // Arrange & Act
   await dashboardPage.navigate();
 
-  // Assert — navigation must have exactly two links regardless of viewport
-  await expect(dashboardPage.navLinks).toHaveCount(2);
+  // Assert — navigation must have exactly three links (Login, Dashboard, Downloads)
+  await expect(dashboardPage.navLinks).toHaveCount(3);
 });

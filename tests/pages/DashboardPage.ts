@@ -7,6 +7,8 @@ export class DashboardPage {
   readonly heading: Locator;
   readonly claudeBadge: Locator;
   readonly loadingIndicator: Locator;
+  readonly dashboardError: Locator;
+  readonly reportsTable: Locator;
 
   constructor(private readonly page: Page) {
     this.logo             = page.locator('.logo');
@@ -15,6 +17,8 @@ export class DashboardPage {
     this.heading          = page.locator('h1');
     this.claudeBadge      = page.locator('.claude-badge');
     this.loadingIndicator = page.locator('#loading');
+    this.dashboardError   = page.locator('#dashboard-error');
+    this.reportsTable     = page.locator('#reports-table');
   }
 
   async navigate(): Promise<void> {
