@@ -40,7 +40,6 @@ jobs:
         run: npm test
         env:
           CI: true
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Generate Allure report
         if: always()
@@ -52,12 +51,23 @@ jobs:
       - name: Build GitHub Pages site
         if: always()
         run: |
-          mkdir -p gh-pages/report
+          mkdir -p gh-pages/report gh-pages/data
           cp -r allure-report/. gh-pages/report/
           cp src/pages/login.html     gh-pages/login.html
           cp src/pages/dashboard.html gh-pages/dashboard.html
           touch gh-pages/.nojekyll
-          printf '<meta http-equiv="refresh" content="0;url=./report/index.html" />\n' > gh-pages/index.html
+          # Root redirects to the Allure test report
+          printf '<meta http-equiv="refresh" content="0;url=report/index.html" />\n' > gh-pages/index.html
+          # Pre-built sample data so the dashboard works without a running server
+          cat > gh-pages/data/dashboard.json << 'JSONEOF'
+          [
+            {"manufacturer":"מנורה מבטחים","month":"06-2025","category":"life","totalCommission":128400,"policyCount":87,"status":"processed"},
+            {"manufacturer":"הפניקס ביטוח","month":"06-2025","category":"health","totalCommission":94250,"policyCount":63,"status":"processed"},
+            {"manufacturer":"הראל ביטוח","month":"05-2025","category":"pension","totalCommission":211800,"policyCount":142,"status":"processed"},
+            {"manufacturer":"מגדל ביטוח","month":"05-2025","category":"property","totalCommission":67900,"policyCount":44,"status":"pending"},
+            {"manufacturer":"כלל ביטוח","month":"04-2025","category":"life","totalCommission":154600,"policyCount":103,"status":"processed"}
+          ]
+          JSONEOF
 
       - name: Upload Allure artifact
         if: always()
@@ -67,15 +77,10 @@ jobs:
           path: gh-pages/report/
           retention-days: 30
 
-      - name: Deploy to gh-pages branch
+      - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          cd gh-pages
-          git init
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "deploy: ${GITHUB_SHA::7}"
-          git push -f \
-            https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git \
-            HEAD:gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: gh-pages
+          branch: gh-pages
+          clean: true

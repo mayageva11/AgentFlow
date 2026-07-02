@@ -80,9 +80,18 @@
     .page-header {
       margin-bottom: 32px; padding-bottom: 24px;
       border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
     }
     .page-header h1 { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
     .page-header p  { font-size: 13px; color: var(--muted); }
+
+    .source-badge {
+      font-size: 10px; font-weight: 600; letter-spacing: .06em;
+      padding: 3px 10px; border-radius: 10px;
+      text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
+    }
+    .source-live   { background: rgba(52,211,153,.1);   color: #34d399; }
+    .source-static { background: var(--teal-lo); color: var(--teal); border: 1px solid rgba(0,207,200,.2); }
 
     #loading {
       display: flex; flex-direction: column;
@@ -164,6 +173,7 @@
       header { padding: 0 20px; }
       .brand-tag { display: none; }
       main { padding: 24px 16px 48px; }
+      .page-header { flex-direction: column; align-items: flex-start; }
       thead { display: none; }
       tbody tr {
         display: block; padding: 12px 16px;
@@ -187,20 +197,23 @@
   <div class="pulse-bar"></div>
 
   <header>
-    <a class="brand" href="/dashboard">
+    <a class="brand" href="dashboard.html">
       <span class="logo">AgentFlow</span>
       <span class="brand-tag">Hub</span>
     </a>
     <nav>
-      <a href="/login">Login</a>
-      <a href="/dashboard" class="active">Dashboard</a>
+      <a href="login.html">Login</a>
+      <a href="dashboard.html" class="active">Dashboard</a>
     </nav>
   </header>
 
   <main>
     <div class="page-header">
-      <h1>Commission Ledger</h1>
-      <p>Processed commission reports from manual insurer uploads</p>
+      <div>
+        <h1>Commission Ledger</h1>
+        <p>Processed commission reports from manual insurer uploads</p>
+      </div>
+      <span class="source-badge" id="source-badge" style="display:none"></span>
     </div>
 
     <div id="loading">
@@ -264,26 +277,46 @@
       return tr;
     }
 
+    function showTable(rows, sourceLabel, sourceClass) {
+      var tbody   = document.getElementById('reports-body');
+      var tableEl = document.getElementById('reports-table');
+      var countEl = document.getElementById('row-count');
+      var badge   = document.getElementById('source-badge');
+
+      rows.forEach(function(r) { tbody.appendChild(renderRow(r)); });
+      countEl.textContent   = rows.length + ' record' + (rows.length === 1 ? '' : 's');
+      tableEl.style.display = 'block';
+      badge.textContent     = sourceLabel;
+      badge.className       = 'source-badge ' + sourceClass;
+      badge.style.display   = 'inline-block';
+    }
+
     async function loadReports() {
       var loadingEl = document.getElementById('loading');
       var errorEl   = document.getElementById('dashboard-error');
-      var tableEl   = document.getElementById('reports-table');
-      var tbody     = document.getElementById('reports-body');
-      var countEl   = document.getElementById('row-count');
 
       loadingEl.style.display = 'flex';
       errorEl.style.display   = 'none';
-      tableEl.style.display   = 'none';
 
       try {
+        // Layer 1: live server API
         var res = await fetch('/api/dashboard');
         if (!res.ok) throw new Error('HTTP ' + res.status);
+        var ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) throw new Error('Not JSON');
         var data = await res.json();
-        data.forEach(function(r) { tbody.appendChild(renderRow(r)); });
-        countEl.textContent   = data.length + ' record' + (data.length === 1 ? '' : 's');
-        tableEl.style.display = 'block';
+        showTable(data, 'Live data', 'source-live');
       } catch (_) {
-        errorEl.style.display = 'block';
+        try {
+          // Layer 2: pre-built static snapshot (CI-generated, served alongside HTML)
+          var staticRes = await fetch('./data/dashboard.json');
+          if (!staticRes.ok) throw new Error();
+          var staticData = await staticRes.json();
+          showTable(staticData, 'Sample data', 'source-static');
+        } catch (_) {
+          // Both sources unavailable
+          errorEl.style.display = 'block';
+        }
       } finally {
         loadingEl.style.display = 'none';
       }
