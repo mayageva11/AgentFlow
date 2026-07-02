@@ -51,27 +51,12 @@ All hard requirements — status codes, all-or-nothing rejection, SHA-256 duplic
 
 ## Quick start
 
-### Option A — Docker (recommended)
-
 ```bash
 git clone https://github.com/mayageva11/AgentFlow
 cd AgentFlow
 npm install
 npx playwright install chromium
 npm run generate:fixtures
-
-docker-compose up -d
-npm test
-docker-compose down
-```
-
-### Option B — local server
-
-```bash
-npm install
-npx playwright install chromium
-npm run generate:fixtures
-npm run server &
 npm test
 ```
 
@@ -164,7 +149,6 @@ Every push to `main`:
 | **Playwright** | Browser automation, API testing, network mocking, multi-project |
 | **TypeScript** (strict) | End-to-end type safety |
 | **Express.js** | Mock insurance platform API |
-| **Docker** | `docker-compose up` replaces `npm run server` |
 | **Allure** | Test report generation |
 | **GitHub Actions** | CI with automated Pages deployment |
 | **XLSX** | Fixture generation and server-side file parsing |
