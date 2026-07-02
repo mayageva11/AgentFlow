@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, request as playwrightRequest } from '@playwright/test';
 import path from 'path';
 import { uploadFile } from '../helpers/uploadHelper';
 import { createManufacturer } from '../helpers/manufacturerHelper';
@@ -72,16 +72,17 @@ test('file with wrong category returns status 67', async ({ request }) => {
   expect(result.status).toBe(67);
 });
 
-test('manufacturer from agency A not accessible by agency B', async ({ request }) => {
-  // Arrange
-  const { id } = await createManufacturer(request, {
-    name: 'Agency A Corp',
-    iconColor: '#FF0000',
-    agencyId: 'agency-a',
-  });
+test('manufacturer from agency A is not accessible by agency B', async ({ request }) => {
+  // Arrange — create manufacturer under agency-a (current session)
+  const { id } = await createManufacturer(request, { name: 'Agency A Corp', iconColor: '#FF0000' });
 
-  // Act
-  const response = await request.get(`/api/manufacturer/${id}?agencyId=agency-b`);
+  // Act — attempt read with an agency-b session context
+  const agencyBCtx = await playwrightRequest.newContext({
+    baseURL: 'http://127.0.0.1:4000',
+    storageState: '.auth/agency-b.json',
+  });
+  const response = await agencyBCtx.get(`/api/manufacturer/${id}`);
+  await agencyBCtx.dispose();
 
   // Assert
   expect(response.status()).toBe(404);

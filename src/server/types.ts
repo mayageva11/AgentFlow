@@ -17,7 +17,6 @@ export interface UploadResponse {
 export interface ManufacturerData {
   name: string;
   iconColor: string;
-  agencyId: string;
 }
 
 export interface ReportData {

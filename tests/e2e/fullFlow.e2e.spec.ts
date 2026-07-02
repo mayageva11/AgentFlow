@@ -11,7 +11,6 @@ test('happy path: create manufacturer, create report, upload valid file — stat
   const { id: manufacturerId } = await createManufacturer(request, {
     name: 'FlowTest Corp',
     iconColor: '#00D4D4',
-    agencyId: 'agency-flow',
   });
   await createReport(request, {
     manufacturerId,
@@ -50,7 +49,7 @@ test('duplicate upload: upload same file twice — second upload rejected', asyn
   await page.click('#upload-btn');
   await expect(page.locator('#upload-result')).toContainText('50');
 
-  // Act — second upload of same file
+  // Act — second upload of the identical file
   await page.setInputFiles('#upload-file', fix('valid-upload-dup.xlsx'));
   await page.click('#upload-btn');
 

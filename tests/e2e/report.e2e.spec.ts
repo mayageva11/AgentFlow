@@ -7,7 +7,6 @@ test('create report under manufacturer — correct branch and category saved', a
   const { id: manufacturerId } = await createManufacturer(request, {
     name: 'Report Test Corp',
     iconColor: '#00AA88',
-    agencyId: 'agency-report-test',
   });
   await page.goto('/downloads');
 

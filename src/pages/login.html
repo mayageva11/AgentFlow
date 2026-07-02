@@ -28,6 +28,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 16px;
     }
 
     .pulse-bar {
@@ -40,7 +41,7 @@
 
     @keyframes pulse {
       0%, 100% { opacity: 0.4; box-shadow: 0 0 4px var(--teal); }
-      50% { opacity: 1; box-shadow: 0 0 16px var(--teal), 0 0 32px var(--teal); }
+      50%       { opacity: 1;   box-shadow: 0 0 16px var(--teal), 0 0 32px var(--teal); }
     }
 
     .card {
@@ -49,7 +50,7 @@
       border-radius: 12px;
       padding: 48px 40px;
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
     }
 
     .logo {
@@ -118,6 +119,14 @@
       margin-top: 14px;
       min-height: 18px;
     }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      body { justify-content: flex-start; padding-top: 48px; }
+      .card { padding: 32px 20px; border-radius: 10px; }
+      .logo { font-size: 18px; }
+      input { font-size: 16px; /* prevents iOS zoom */ }
+    }
   </style>
 </head>
 <body>
@@ -137,7 +146,7 @@
   <script>
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.querySelector('[name="email"]').value;
+      const email    = document.querySelector('[name="email"]').value;
       const password = document.querySelector('[name="password"]').value;
       const res = await fetch('/api/login', {
         method: 'POST',
