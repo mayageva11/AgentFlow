@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # required for peaceiris/actions-gh-pages to push gh-pages branch
 
     steps:
       - name: Checkout
