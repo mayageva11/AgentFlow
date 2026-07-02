@@ -3,6 +3,7 @@ import path from 'path';
 import manufacturerRouter from './routes/manufacturer';
 import reportRouter from './routes/report';
 import uploadRouter from './routes/upload';
+import { resetState } from './state';
 
 const app = express();
 const PORT = 4000;
@@ -17,6 +18,11 @@ const USERS: Record<string, { agencyId: string; password: string }> = {
 app.use(express.json());
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
+
+app.post('/api/reset', (_req, res) => {
+  resetState();
+  res.json({ ok: true });
+});
 
 app.get('/login',     (_req, res) => res.sendFile(path.join(PAGES, 'login.html')));
 app.get('/dashboard', (_req, res) => res.sendFile(path.join(PAGES, 'dashboard.html')));

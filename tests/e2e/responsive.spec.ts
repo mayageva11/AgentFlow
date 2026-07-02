@@ -1,15 +1,18 @@
 import { test, expect } from '../fixtures/testBase';
 
-test('login page fits viewport — all form fields visible without horizontal scroll', async ({ loginPage }) => {
+test('login page fits viewport — all form fields visible without horizontal scroll', async ({
+  loginPage
+}) => {
   await loginPage.navigate();
-
   expect(await loginPage.fitsViewport()).toBe(true);
   await expect(loginPage.emailInput).toBeVisible();
   await expect(loginPage.passwordInput).toBeVisible();
   await expect(loginPage.submitButton).toBeVisible();
 });
 
-test('dashboard page fits viewport — header and table visible after load', async ({ dashboardPage }) => {
+test('dashboard page fits viewport — header and table visible after load', async ({
+  dashboardPage
+}) => {
   await dashboardPage.navigate();
   await dashboardPage.waitForLoad();
 
@@ -19,8 +22,9 @@ test('dashboard page fits viewport — header and table visible after load', asy
   await expect(dashboardPage.heading).toBeVisible();
 });
 
-test('nav contains exactly two links on all viewports', async ({ dashboardPage }) => {
+test('nav contains exactly two links on all viewports', async ({
+  dashboardPage
+}) => {
   await dashboardPage.navigate();
-
   await expect(dashboardPage.navLinks).toHaveCount(2);
 });

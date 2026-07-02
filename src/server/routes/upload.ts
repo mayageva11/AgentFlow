@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import { Row } from '../types';
 import { isFileEmpty } from '../validators/fileValidator';
 import { validateRow } from '../validators/rowValidator';
-import { uploadHistory, commissionData, CommissionRecord } from '../state';
+import { uploadHistory, commissionData, CommissionRecord, uploadedHashes } from '../state';
 import { getAgencyId } from '../utils/session';
 
 const COMMISSION_RATE: Record<string, number> = {
@@ -35,7 +35,6 @@ function aggregateCommission(rows: Row[], manufacturer: string): CommissionRecor
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
-const uploadedHashes = new Set<string>();
 
 const TEMPLATE_HEADERS = ['month', 'policy_id', 'category'];
 

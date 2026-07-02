@@ -1,0 +1,38 @@
+{
+  "dashboard": {
+    "agencyA": [
+      {
+        "manufacturer": "Menora (Agency A Custom)",
+        "month": "06-2024",
+        "category": "life",
+        "totalCommission": 9999,
+        "policyCount": 42,
+        "status": "processed"
+      }
+    ],
+    "agencyB": [
+      {
+        "manufacturer": "Clal (Agency B Custom)",
+        "month": "07-2024",
+        "category": "health",
+        "totalCommission": 1500,
+        "policyCount": 12,
+        "status": "processed"
+      }
+    ]
+  },
+  "manufacturer": {
+    "success": { "id": "MFR-999AA" },
+    "notFound": { "error": "Not found" }
+  },
+  "report": {
+    "success": { "id": "RPT-888XYZ" },
+    "forbidden": { "error": "Forbidden: manufacturer belongs to another agency" }
+  },
+  "upload": {
+    "status50": { "status": 50 },
+    "status61": { "status": 61 },
+    "status67": { "status": 67 },
+    "status70": { "status": 70 }
+  }
+}

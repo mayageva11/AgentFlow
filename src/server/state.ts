@@ -34,5 +34,14 @@ export interface CommissionRecord {
 
 export const manufacturers   = new Map<string, StoredManufacturer>();
 export const reports         = new Map<string, StoredReport>();
-export const uploadHistory: UploadEntry[]    = [];
+export const uploadHistory: UploadEntry[]       = [];
 export const commissionData: CommissionRecord[] = [];
+export const uploadedHashes                     = new Set<string>();
+
+export function resetState(): void {
+  manufacturers.clear();
+  reports.clear();
+  uploadHistory.length = 0;
+  commissionData.length = 0;
+  uploadedHashes.clear();
+}

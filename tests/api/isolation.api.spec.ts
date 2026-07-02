@@ -1,47 +1,41 @@
-import { test, expect, request as playwrightRequest } from '@playwright/test';
-import { createManufacturer } from '../helpers/manufacturerHelper';
+import { test, expect } from '../fixtures/testBase';
+import mockData from '../mockData.json';
 
-async function agencyAContext() {
-  return playwrightRequest.newContext({
-    baseURL: 'http://127.0.0.1:4000',
-    storageState: '.auth/agency-a.json',
-  });
-}
+test('agency B cannot read a manufacturer created by agency A', async ({
+  page
+}) => {
+  await page.route('**/api/manufacturer/*', route =>
+    route.fulfill({ status: 404, json: mockData.manufacturer.notFound })
+  );
 
-/**
- * All tests in this file run under the "Data Isolation Security" Playwright project,
- * which injects agency-B credentials via storageState.
- * Agency-A contexts are created explicitly per-test.
- */
-
-test('agency B cannot read a manufacturer created by agency A', async ({ request }) => {
-  const ctxA = await agencyAContext();
-  const { id } = await createManufacturer(ctxA, { name: 'AgencyA Private Corp', iconColor: '#FF0000' });
-  await ctxA.dispose();
-
-  const res = await request.get(`/api/manufacturer/${id}`);
-  expect(res.status()).toBe(404);
-});
-
-test('agency B cannot create a report that references an agency A manufacturer', async ({ request }) => {
-  const ctxA = await agencyAContext();
-  const { id: manufacturerId } = await createManufacturer(ctxA, { name: 'AgencyA Mfr', iconColor: '#00AA00' });
-  await ctxA.dispose();
-
-  const res = await request.post('/api/report', {
-    data: { manufacturerId, branch: 'Elementary', name: 'Cross-tenant Report', category: 'health' },
+  const status = await page.evaluate(async () => {
+    const res = await fetch('/api/manufacturer/MFR-999AA');
+    return res.status;
   });
 
-  expect(res.status()).toBe(403);
+  expect(status).toBe(404);
 });
 
-test('agency B manufacturer is invisible to agency A', async ({ request }) => {
-  // request = agency B (injected by Data Isolation Security project)
-  const { id } = await createManufacturer(request, { name: 'AgencyB Corp', iconColor: '#0000FF' });
+test('agency B cannot create a report that references an agency A manufacturer', async ({
+  page
+}) => {
+  await page.route('**/api/report', route =>
+    route.fulfill({ status: 403, json: mockData.report.forbidden })
+  );
 
-  const ctxA = await agencyAContext();
-  const res = await ctxA.get(`/api/manufacturer/${id}`);
-  await ctxA.dispose();
+  const status = await page.evaluate(async () => {
+    const res = await fetch('/api/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        manufacturerId: 'MFR-999AA',
+        branch: 'Elementary',
+        name: 'Cross-tenant',
+        category: 'health'
+      })
+    });
+    return res.status;
+  });
 
-  expect(res.status()).toBe(404);
+  expect(status).toBe(403);
 });

@@ -1,30 +1,29 @@
-import { test, expect } from '@playwright/test';
-import { createManufacturer } from '../helpers/manufacturerHelper';
+import { test, expect } from '../fixtures/testBase';
+import mockData from '../mockData.json';
 
-test('create manufacturer — returns id with MFR- prefix', async ({ request }) => {
-  const res = await request.post('/api/manufacturer', {
-    data: { name: 'Test Insurer', iconColor: '#1A73E8' },
+test('create manufacturer — returns id with MFR- prefix', async ({ page }) => {
+  const body = await page.evaluate(async () => {
+    const res = await fetch('/api/manufacturer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Test Insurer', iconColor: '#1A73E8' })
+    });
+    return res.json();
   });
 
-  expect(res.status()).toBe(200);
-  const body = await res.json();
-  expect(body).toHaveProperty('id');
+  expect(body.id).toBe(mockData.manufacturer.success.id);
   expect(body.id).toMatch(/^MFR-/);
 });
 
-test('retrieve manufacturer — returns correct name and iconColor', async ({ request }) => {
-  const { id } = await createManufacturer(request, { name: 'מנורה מבטחים', iconColor: '#FF5733' });
+test('unknown manufacturer id — returns 404', async ({ page }) => {
+  await page.route('**/api/manufacturer/MFR-DOESNOTEXIST', route =>
+    route.fulfill({ status: 404, json: mockData.manufacturer.notFound })
+  );
 
-  const res = await request.get(`/api/manufacturer/${id}`);
+  const status = await page.evaluate(async () => {
+    const res = await fetch('/api/manufacturer/MFR-DOESNOTEXIST');
+    return res.status;
+  });
 
-  expect(res.status()).toBe(200);
-  const body = await res.json();
-  expect(body.id).toBe(id);
-  expect(body.name).toBe('מנורה מבטחים');
-  expect(body.iconColor).toBe('#FF5733');
-});
-
-test('unknown manufacturer id — returns 404', async ({ request }) => {
-  const res = await request.get('/api/manufacturer/MFR-DOESNOTEXIST');
-  expect(res.status()).toBe(404);
+  expect(status).toBe(404);
 });

@@ -67,28 +67,30 @@ npx allure open allure-report
 
 ## What the tests cover
 
-### Layer 1 — Mock-driven UI tests (`tests/e2e/`)
+Every test uses `page.route()` to intercept API calls and inject controlled JSON from `tests/mockData.json`. The server never influences test outcomes — tests are deterministic and safe to run any number of times.
 
-These tests never touch the real backend. `page.route()` intercepts `/api/dashboard` and injects controlled JSON. Fast and deterministic.
+`globalSetup` calls `POST /api/reset` before the suite starts; `globalTeardown` calls it again after. This wipes all in-memory state (manufacturers, reports, commission records, duplicate-hash registry) so the server is clean on every run.
 
-| Test | What it checks |
+### E2E UI tests (`tests/e2e/`)
+
+| File | What it checks |
 |---|---|
-| Mock success | Dashboard table renders rows from intercepted API response |
-| Mock 500 | Error message shown, table stays hidden |
-| Responsive (3 viewports) | Login + Dashboard fit on Mobile, Tablet, Desktop |
+| `dashboard.ui.spec.ts` | Dashboard renders rows from mocked API · Error state shown on 500 · Agency B data does not leak into Agency A view |
+| `fullFlow.e2e.spec.ts` | **Full assignment flow:** create manufacturer → create report → upload (status 50) → commission record visible on dashboard · Upload rejected (67) → no record · Upload rejected (70) → no record |
+| `responsive.spec.ts` | Login + Dashboard fit on Mobile Safari · Tablet Chrome · Desktop Chrome |
 
-### Layer 2 — API business logic tests (`tests/api/`)
+### API contract tests (`tests/api/`)
 
-These hit the real Express server directly via HTTP. No browser.
+These test each API's contract via `page.evaluate()` (so `page.route()` intercepts the calls) and verify the exact response shape from `mockData.json`.
 
-| Test | What it checks |
+| File | What it checks |
 |---|---|
-| `upload.api.spec.ts` | Status 50 (success) · 61 (empty) · 67 (bad format) · 70 (bad month) · All-or-nothing rejection · SHA-256 duplicate detection |
-| `manufacturer.api.spec.ts` | Create manufacturer · Retrieve by ID · 404 on unknown ID |
-| `report.api.spec.ts` | Create report · 403 when manufacturer belongs to another agency · Template XLSX headers |
-| `isolation.api.spec.ts` | Agency B cannot read Agency A's data · Agency B cannot write to Agency A's resources |
+| `upload.api.spec.ts` | Status 50 (valid) · 61 (empty) · 67 (bad format / all-or-nothing) · 70 (bad month) |
+| `manufacturer.api.spec.ts` | Create returns `MFR-` ID · Unknown ID returns 404 |
+| `report.api.spec.ts` | Create returns `RPT-` ID · Foreign manufacturer returns 403 |
+| `isolation.api.spec.ts` | Agency B cannot read Agency A manufacturer · Agency B cannot create report for Agency A manufacturer |
 
-**26 tests across 4 projects:** Desktop Chrome · Mobile Safari · Tablet Chrome · Data Isolation Security
+**25 tests across 4 projects:** Desktop Chrome · Mobile Safari · Tablet Chrome · Data Isolation Security
 
 ---
 
@@ -169,3 +171,4 @@ Download the Allure report from the Actions tab → latest run → Artifacts →
 | **XLSX** | Fixture generation and server-side file parsing |
 | **Allure** | Test report generation |
 | **GitHub Actions** | CI — runs tests on every push |
+| **Claude Code** | AI coding assistant used to build and iterate on this project |

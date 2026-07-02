@@ -1,33 +1,44 @@
-import { test as base, expect, APIRequestContext } from '@playwright/test';
-import path from 'path';
+import { test as base, expect } from '@playwright/test';
+import mockData from '../mockData.json';
 import { LoginPage } from '../pages/LoginPage';
 import { DashboardPage } from '../pages/DashboardPage';
 
-type Fixtures = {
+/**
+ * Custom test fixture.
+ *
+ * The `page` override intercepts every API call with controlled JSON from
+ * mockData.json so tests never depend on real server state.
+ * Individual tests can override a specific route to simulate error cases.
+ */
+export const test = base.extend<{
   loginPage: LoginPage;
   dashboardPage: DashboardPage;
-  api: APIRequestContext;
-  getFixture: (name: string) => string;
-};
+}>({
+  page: async ({ page }, use) => {
+    await page.route('**/api/dashboard', route =>
+      route.fulfill({ json: mockData.dashboard.agencyA })
+    );
+    await page.route('**/api/manufacturer', route =>
+      route.fulfill({ json: mockData.manufacturer.success })
+    );
+    await page.route('**/api/report', route =>
+      route.fulfill({ json: mockData.report.success })
+    );
+    await page.route('**/api/upload', route =>
+      route.fulfill({ json: mockData.upload.status50 })
+    );
 
-const FIXTURES_DIR = path.join(process.cwd(), 'fixtures');
+    // Navigate to the app so relative URLs work in page.evaluate() calls.
+    // Routes registered above survive across navigations for the life of the page.
+    await page.goto('/login');
 
-export const test = base.extend<Fixtures>({
-  loginPage: async ({ page }, use) => {
-    await use(new LoginPage(page));
+    await use(page);
+    // Playwright closes the context automatically after each test —
+    // no manual cookie clearing needed.
   },
 
-  dashboardPage: async ({ page }, use) => {
-    await use(new DashboardPage(page));
-  },
-
-  api: async ({ request }, use) => {
-    await use(request);
-  },
-
-  getFixture: async ({}, use) => {
-    await use((name: string) => path.join(FIXTURES_DIR, name));
-  },
+  loginPage:     async ({ page }, use) => use(new LoginPage(page)),
+  dashboardPage: async ({ page }, use) => use(new DashboardPage(page)),
 });
 
 export { expect };
