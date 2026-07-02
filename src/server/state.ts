@@ -23,6 +23,16 @@ export interface UploadEntry {
   agencyId: string;
 }
 
-export const manufacturers = new Map<string, StoredManufacturer>();
-export const reports       = new Map<string, StoredReport>();
-export const uploadHistory: UploadEntry[] = [];
+export interface CommissionRecord {
+  manufacturer: string;
+  month: string;
+  category: string;
+  totalCommission: number;
+  policyCount: number;
+  status: 'processed';
+}
+
+export const manufacturers   = new Map<string, StoredManufacturer>();
+export const reports         = new Map<string, StoredReport>();
+export const uploadHistory: UploadEntry[]    = [];
+export const commissionData: CommissionRecord[] = [];

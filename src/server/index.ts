@@ -42,7 +42,8 @@ const DASHBOARD_DEMO = [
 ];
 
 app.get('/api/dashboard', (_req, res) => {
-  res.json(DASHBOARD_DEMO);
+  const { commissionData } = require('./state') as typeof import('./state');
+  res.json(commissionData.length > 0 ? commissionData : DASHBOARD_DEMO);
 });
 
 app.use('/api/manufacturer', manufacturerRouter);

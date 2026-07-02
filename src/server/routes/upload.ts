@@ -5,8 +5,33 @@ import crypto from 'crypto';
 import { Row } from '../types';
 import { isFileEmpty } from '../validators/fileValidator';
 import { validateRow } from '../validators/rowValidator';
-import { uploadHistory } from '../state';
+import { uploadHistory, commissionData, CommissionRecord } from '../state';
 import { getAgencyId } from '../utils/session';
+
+const COMMISSION_RATE: Record<string, number> = {
+  life: 1200, health: 900, pension: 1500, property: 600,
+};
+
+function aggregateCommission(rows: Row[], manufacturer: string): CommissionRecord[] {
+  const map = new Map<string, CommissionRecord>();
+  for (const row of rows) {
+    const key = `${row.month}|${row.category}`;
+    if (!map.has(key)) {
+      map.set(key, {
+        manufacturer,
+        month:           row.month     as string,
+        category:        row.category  as string,
+        totalCommission: 0,
+        policyCount:     0,
+        status:          'processed',
+      });
+    }
+    const entry = map.get(key)!;
+    entry.policyCount++;
+    entry.totalCommission += COMMISSION_RATE[row.category as string] ?? 800;
+  }
+  return Array.from(map.values());
+}
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -67,9 +92,10 @@ router.get('/template', (_req: Request, res: Response) => {
 });
 
 router.post('/', upload.single('file'), (req: Request, res: Response) => {
-  const agencyId = getAgencyId(req) ?? 'unknown';
-  const buffer   = req.file!.buffer;
-  const filename = req.file!.originalname;
+  const agencyId    = getAgencyId(req) ?? 'unknown';
+  const buffer      = req.file!.buffer;
+  const filename    = req.file!.originalname;
+  const manufacturer = (req.body.manufacturer as string | undefined)?.trim() || 'Custom Upload';
 
   if (isDuplicate(buffer)) {
     recordUpload(filename, 67, 0, agencyId);
@@ -91,6 +117,9 @@ router.post('/', upload.single('file'), (req: Request, res: Response) => {
     res.json({ status: error.statusCode });
     return;
   }
+
+  // Store aggregated commission records so the dashboard shows real data
+  aggregateCommission(rows, manufacturer).forEach(r => commissionData.unshift(r));
 
   recordUpload(filename, 50, rows.length, agencyId);
   res.json({ status: 50 });

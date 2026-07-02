@@ -76,7 +76,7 @@ export class DownloadsPage {
   }
 
   async fillReportCategory(category: string): Promise<void> {
-    await this.reportCategoryInput.fill(category);
+    await this.reportCategoryInput.selectOption(category);
   }
 
   async clickCreateReport(): Promise<void> {

@@ -7,14 +7,16 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  test-and-deploy:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -55,10 +57,10 @@ jobs:
           rm -rf allure-report
           npx allure generate allure-results -o allure-report
 
-      - name: Build site
+      - name: Build GitHub Pages site
         if: always()
         run: |
-          mkdir -p gh-pages/report allure-report
+          mkdir -p gh-pages/report
           cp -r allure-report/. gh-pages/report/
           cp src/pages/landing.html   gh-pages/index.html
           cp src/pages/login.html     gh-pages/login.html
@@ -70,7 +72,7 @@ jobs:
           fi
           touch gh-pages/.nojekyll
 
-      - name: Upload Allure report artifact
+      - name: Upload Allure artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -78,13 +80,25 @@ jobs:
           path: gh-pages/report/
           retention-days: 30
 
-      - name: Deploy to gh-pages
+      - name: Configure GitHub Pages
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          cd gh-pages
-          git init
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Deploy ${GITHUB_SHA::7}"
-          git push -f https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:gh-pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./gh-pages
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

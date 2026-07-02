@@ -32,11 +32,9 @@
       color: var(--text);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
     }
 
-    /* ── pulse bar ─────────────────────────────────────────── */
     .pulse-bar {
       position: fixed; top: 0; left: 0; right: 0; height: 2px;
       background: var(--teal); z-index: 999;
@@ -47,20 +45,18 @@
       50%      { opacity:1;  box-shadow: 0 0 20px var(--teal), 0 0 40px var(--teal); }
     }
 
-    /* ── header ────────────────────────────────────────────── */
     header {
       position: sticky; top: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
       height: 56px; padding: 0 40px;
-      background: rgba(11,21,35,.88);
-      backdrop-filter: blur(10px);
+      background: rgba(11,21,35,.88); backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
       gap: 16px;
     }
 
     .brand {
-      display: flex; align-items: baseline; gap: 8px; flex-shrink: 0;
-      text-decoration: none;
+      display: flex; align-items: baseline; gap: 8px;
+      flex-shrink: 0; text-decoration: none;
     }
     .logo {
       font-family: 'JetBrains Mono', monospace;
@@ -75,9 +71,7 @@
       padding: 4px 12px; border-radius: 20px;
       background: var(--teal-lo);
       border: 1px solid rgba(0,207,200,.25);
-      color: var(--teal);
-      white-space: nowrap;
-      letter-spacing: .02em;
+      color: var(--teal); white-space: nowrap; letter-spacing: .02em;
     }
 
     nav { display: flex; gap: 2px; flex-shrink: 0; }
@@ -86,10 +80,9 @@
       padding: 6px 12px; border-radius: 6px;
       transition: color .2s, background .2s;
     }
-    nav a:hover  { color: var(--text);  background: rgba(255,255,255,.04); }
-    nav a.active { color: var(--teal);  font-weight: 600; }
+    nav a:hover  { color: var(--text); background: rgba(255,255,255,.04); }
+    nav a.active { color: var(--teal); font-weight: 600; }
 
-    /* ── demo banner ───────────────────────────────────────── */
     #demo-banner {
       display: none;
       background: var(--teal-lo);
@@ -98,24 +91,19 @@
       font-size: 12px; color: var(--teal); text-align: center;
     }
 
-    /* ── main ──────────────────────────────────────────────── */
     main {
-      flex: 1;
-      max-width: 1200px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 40px 40px 64px;
+      flex: 1; max-width: 1200px; width: 100%;
+      margin: 0 auto; padding: 40px 40px 64px;
     }
 
     .page-header {
-      margin-bottom: 32px;
-      padding-bottom: 24px;
+      margin-bottom: 32px; padding-bottom: 24px;
       border-bottom: 1px solid var(--border);
     }
     .page-header h1 { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
     .page-header p  { font-size: 13px; color: var(--muted); }
 
-    /* ── loading ───────────────────────────────────────────── */
+    /* loading */
     #loading {
       display: flex; flex-direction: column;
       align-items: center; gap: 16px;
@@ -131,7 +119,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── error box ─────────────────────────────────────────── */
+    /* error */
     #dashboard-error {
       display: none;
       background: var(--error-bg);
@@ -139,11 +127,10 @@
       border-radius: 10px;
       color: var(--error-fg);
       font-size: 14px; font-weight: 500;
-      padding: 20px 24px;
-      margin-bottom: 24px;
+      padding: 20px 24px; margin-bottom: 24px;
     }
 
-    /* ── reports table ─────────────────────────────────────── */
+    /* table */
     #reports-table { display: none; }
 
     .table-wrapper {
@@ -152,13 +139,33 @@
       border-radius: 12px;
       overflow: hidden;
     }
+
     .table-meta {
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 20px;
       border-bottom: 1px solid var(--border);
+      gap: 12px;
     }
     .table-meta strong { font-size: 13px; color: var(--text); font-weight: 600; }
-    .table-meta span   { font-size: 12px; color: var(--muted); }
+
+    .meta-right { display: flex; align-items: center; gap: 10px; }
+    .meta-right span { font-size: 12px; color: var(--muted); }
+
+    .data-tag {
+      font-size: 10px; font-weight: 600; letter-spacing: .06em;
+      padding: 2px 8px; border-radius: 10px;
+      text-transform: uppercase;
+    }
+    .data-tag.live  { background: var(--ok-bg);   color: var(--ok-fg); }
+    .data-tag.demo  { background: var(--teal-lo);  color: var(--teal);  border: 1px solid rgba(0,207,200,.2); }
+
+    .upload-cta {
+      font-size: 12px; color: var(--teal); text-decoration: none;
+      padding: 4px 10px; border-radius: 6px;
+      border: 1px solid rgba(0,207,200,.3);
+      transition: background .2s;
+    }
+    .upload-cta:hover { background: var(--teal-lo); }
 
     .table-scroll { overflow-x: auto; }
 
@@ -174,8 +181,7 @@
     td {
       padding: 13px 16px;
       border-top: 1px solid var(--border);
-      color: var(--text);
-      vertical-align: middle;
+      color: var(--text); vertical-align: middle;
     }
     td.num {
       text-align: right;
@@ -195,13 +201,12 @@
     .badge-pending { background: var(--warn-bg);  color: var(--warn-fg); }
     .badge-error   { background: var(--error-bg); color: var(--error-fg); }
 
-    /* ── responsive ────────────────────────────────────────── */
+    /* responsive */
     @media (max-width: 768px) {
       header { padding: 0 20px; }
       .brand-tag { display: none; }
       .header-center { display: none; }
       main { padding: 24px 16px 48px; }
-
       thead { display: none; }
       tbody tr {
         display: block; padding: 12px 16px;
@@ -243,13 +248,13 @@
   </header>
 
   <div id="demo-banner">
-    ✦ Demo Mode — sample commission data &nbsp;·&nbsp; GitHub Pages deployment
+    ✦ Demo Mode — sample commission data shown &nbsp;·&nbsp; Upload a file in <a href="./downloads.html" style="color:inherit;font-weight:600">Downloads</a> to see live data
   </div>
 
   <main>
     <div class="page-header">
       <h1>Commission Ledger</h1>
-      <p>Processed commission reports — current reporting period</p>
+      <p>Processed commission reports from manual insurer uploads</p>
     </div>
 
     <div id="loading">
@@ -263,7 +268,11 @@
       <div class="table-wrapper">
         <div class="table-meta">
           <strong>Commission Records</strong>
-          <span id="row-count"></span>
+          <div class="meta-right">
+            <span id="row-count"></span>
+            <span class="data-tag" id="data-tag"></span>
+            <a href="/downloads" class="upload-cta" id="upload-cta">+ Upload file</a>
+          </div>
         </div>
         <div class="table-scroll">
           <table>
@@ -285,7 +294,6 @@
   </main>
 
   <script>
-    // ── environment ──────────────────────────────────────────
     const isGitHubPages = window.location.hostname.includes('github.io');
 
     const NAV = {
@@ -294,13 +302,13 @@
       '/downloads': isGitHubPages ? './downloads.html' : '/downloads',
     };
 
-    document.querySelectorAll('nav a[href], #home-link').forEach(function(a) {
+    document.querySelectorAll('nav a[href], #home-link, #upload-cta').forEach(function(a) {
       var k = a.getAttribute('href');
       if (NAV[k]) a.href = NAV[k];
     });
 
     if (isGitHubPages) {
-      document.getElementById('home-link').href = './index.html';
+      document.getElementById('home-link').href  = './index.html';
       document.getElementById('demo-banner').style.display = 'block';
     }
 
@@ -317,6 +325,15 @@
       return s ? s.charAt(0).toUpperCase() + s.slice(1) : '—';
     }
 
+    // ── demo fallback ────────────────────────────────────────
+    var DEMO_REPORTS = [
+      { manufacturer: 'מנורה מבטחים', month: '06-2025', category: 'life',     totalCommission: 128400, policyCount: 87,  status: 'processed' },
+      { manufacturer: 'הפניקס ביטוח', month: '06-2025', category: 'health',   totalCommission: 94250,  policyCount: 63,  status: 'processed' },
+      { manufacturer: 'הראל ביטוח',   month: '05-2025', category: 'pension',  totalCommission: 211800, policyCount: 142, status: 'processed' },
+      { manufacturer: 'מגדל ביטוח',   month: '05-2025', category: 'property', totalCommission: 67900,  policyCount: 44,  status: 'pending'   },
+      { manufacturer: 'כלל ביטוח',    month: '04-2025', category: 'life',     totalCommission: 154600, policyCount: 103, status: 'processed' },
+    ];
+
     // ── row renderer ─────────────────────────────────────────
     function renderRow(r) {
       var tr  = document.createElement('tr');
@@ -331,25 +348,20 @@
       return tr;
     }
 
-    // ── demo data (fallback for GitHub Pages or empty response) ──
-    var DEMO_REPORTS = [
-      { manufacturer: 'מנורה מבטחים', month: '06-2025', category: 'life',     totalCommission: 128400, policyCount: 87,  status: 'processed' },
-      { manufacturer: 'הפניקס ביטוח', month: '06-2025', category: 'health',   totalCommission: 94250,  policyCount: 63,  status: 'processed' },
-      { manufacturer: 'הראל ביטוח',   month: '05-2025', category: 'pension',  totalCommission: 211800, policyCount: 142, status: 'processed' },
-      { manufacturer: 'מגדל ביטוח',   month: '05-2025', category: 'property', totalCommission: 67900,  policyCount: 44,  status: 'pending'   },
-      { manufacturer: 'כלל ביטוח',    month: '04-2025', category: 'life',     totalCommission: 154600, policyCount: 103, status: 'processed' },
-    ];
-
-    function showRows(rows) {
+    function showRows(rows, isDemo) {
       var tbody   = document.getElementById('reports-body');
       var countEl = document.getElementById('row-count');
+      var tagEl   = document.getElementById('data-tag');
       var tableEl = document.getElementById('reports-table');
+
       rows.forEach(function(r) { tbody.appendChild(renderRow(r)); });
       countEl.textContent   = rows.length + ' record' + (rows.length === 1 ? '' : 's');
+      tagEl.textContent     = isDemo ? 'Sample data' : 'Live data';
+      tagEl.className       = 'data-tag ' + (isDemo ? 'demo' : 'live');
       tableEl.style.display = 'block';
     }
 
-    // ── loader ───────────────────────────────────────────────
+    // ── main loader ──────────────────────────────────────────
     async function loadReports() {
       var loadingEl = document.getElementById('loading');
       var errorEl   = document.getElementById('dashboard-error');
@@ -358,29 +370,26 @@
       loadingEl.style.display = 'flex';
       errorEl.style.display   = 'none';
 
-      // GitHub Pages: try pre-generated data file, fall back to demo
       if (isGitHubPages) {
         var rows = null;
         try {
           var r = await fetch('./data/dashboard.json');
-          if (r.ok) {
-            var d = await r.json();
-            if (Array.isArray(d) && d.length) rows = d;
-          }
+          if (r.ok) { var d = await r.json(); if (Array.isArray(d) && d.length) rows = d; }
         } catch (_) {}
-        showRows(rows || DEMO_REPORTS);
+        showRows(rows || DEMO_REPORTS, !rows);
         badgeEl.textContent     = rows ? '🤖 Claude API — Pre-generated' : '🤖 Static Demo Sandbox';
         loadingEl.style.display = 'none';
         return;
       }
 
-      // Live server
       try {
         var res  = await fetch('/api/dashboard');
         if (!res.ok) throw new Error(String(res.status));
         var data = await res.json();
         var rows = Array.isArray(data) && data.length > 0 ? data : DEMO_REPORTS;
-        showRows(rows);
+        // Detect whether this is demo data (same first manufacturer)
+        var isDemo = rows === DEMO_REPORTS || (rows[0] && rows[0].manufacturer === DEMO_REPORTS[0].manufacturer);
+        showRows(rows, isDemo);
         badgeEl.textContent = '🤖 Live Server Core Active';
       } catch (_) {
         errorEl.style.display = 'block';

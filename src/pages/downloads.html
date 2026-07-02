@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AgentFlow Hub — Upload &amp; Templates</title>
+  <title>AgentFlow Hub — Manual Import</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -30,11 +30,9 @@
       color: var(--text);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
     }
 
-    /* ── pulse bar ─────────────────────────────────────────── */
     .pulse-bar {
       position: fixed; top: 0; left: 0; right: 0; height: 2px;
       background: var(--teal); z-index: 999;
@@ -45,21 +43,16 @@
       50%      { opacity:1;  box-shadow: 0 0 20px var(--teal), 0 0 40px var(--teal); }
     }
 
-    /* ── header ────────────────────────────────────────────── */
     header {
       position: sticky; top: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
       height: 56px; padding: 0 40px;
-      background: rgba(11,21,35,.88);
-      backdrop-filter: blur(10px);
+      background: rgba(11,21,35,.88); backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
     }
 
-    .brand { display: flex; align-items: baseline; gap: 8px; }
-    .logo {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 16px; color: var(--teal); letter-spacing: .05em;
-    }
+    .brand { display: flex; align-items: baseline; gap: 8px; text-decoration: none; }
+    .logo  { font-family: 'JetBrains Mono', monospace; font-size: 16px; color: var(--teal); letter-spacing: .05em; }
     .brand-tag { font-size: 11px; color: var(--muted); }
 
     nav { display: flex; gap: 2px; }
@@ -68,32 +61,41 @@
       padding: 6px 12px; border-radius: 6px;
       transition: color .2s, background .2s;
     }
-    nav a:hover  { color: var(--text);  background: rgba(255,255,255,.04); }
-    nav a.active { color: var(--teal);  font-weight: 600; }
+    nav a:hover  { color: var(--text); background: rgba(255,255,255,.04); }
+    nav a.active { color: var(--teal); font-weight: 600; }
 
-    /* ── main layout ───────────────────────────────────────── */
     main {
-      flex: 1;
-      max-width: 1100px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 40px 40px 64px;
+      flex: 1; max-width: 1100px; width: 100%;
+      margin: 0 auto; padding: 40px 40px 64px;
     }
 
     .page-header {
-      margin-bottom: 32px;
-      padding-bottom: 24px;
+      margin-bottom: 36px; padding-bottom: 24px;
       border-bottom: 1px solid var(--border);
     }
     .page-header h1 { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
     .page-header p  { font-size: 13px; color: var(--muted); }
 
-    /* ── top row: two equal cards ──────────────────────────── */
-    .card-row {
+    /* ── step sections ─────────────────────────────────────── */
+    .step {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      grid-template-columns: 48px 1fr;
+      gap: 0 20px;
       margin-bottom: 24px;
+      align-items: start;
+    }
+
+    .step-num {
+      width: 48px; height: 48px;
+      background: var(--teal-lo);
+      border: 1px solid rgba(0,207,200,.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px; font-weight: 600;
+      color: var(--teal);
+      flex-shrink: 0;
+      margin-top: 2px;
     }
 
     /* ── card ──────────────────────────────────────────────── */
@@ -101,28 +103,27 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 28px 28px 24px;
+      padding: 24px 28px 20px;
     }
 
     .card-title {
-      font-size: 13px; font-weight: 600;
-      color: var(--text); text-transform: uppercase;
-      letter-spacing: .07em; margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
+      font-size: 14px; font-weight: 600;
+      color: var(--text); margin-bottom: 4px;
     }
-    .card-title span {
-      font-size: 10px; color: var(--muted);
-      text-transform: none; letter-spacing: 0;
-      font-weight: 400; margin-left: 6px;
+    .card-desc {
+      font-size: 12px; color: var(--muted);
+      margin-bottom: 20px; line-height: 1.6;
     }
 
-    /* ── form elements ─────────────────────────────────────── */
+    /* ── form ──────────────────────────────────────────────── */
     label {
-      display: block;
-      font-size: 11px; font-weight: 600;
+      display: block; font-size: 11px; font-weight: 600;
       color: var(--muted); text-transform: uppercase;
       letter-spacing: .07em; margin-bottom: 6px;
+    }
+
+    .form-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
     }
 
     input[type="text"],
@@ -134,10 +135,8 @@
       border-radius: 8px;
       color: var(--text);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      padding: 10px 12px;
-      outline: none;
-      margin-bottom: 16px;
+      font-size: 13px; padding: 10px 12px;
+      outline: none; margin-bottom: 16px;
       transition: border-color .2s, box-shadow .2s;
     }
     input[type="text"]:focus,
@@ -147,110 +146,106 @@
       box-shadow: 0 0 0 3px rgba(0,207,200,.12);
     }
 
-    select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23607a97' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+    select {
+      appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23607a97' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      padding-right: 32px;
+    }
+    select option { background: var(--surface); color: var(--text); }
 
     input[type="color"] {
       width: 100%; height: 42px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 4px 6px;
-      cursor: pointer;
-      outline: none;
-      margin-bottom: 16px;
+      border-radius: 8px; padding: 4px 6px;
+      cursor: pointer; outline: none; margin-bottom: 16px;
       transition: border-color .2s;
     }
     input[type="color"]:focus { border-color: var(--teal); }
 
-    /* ── file upload ───────────────────────────────────────── */
+    /* file input */
     #upload-file {
       width: 100%;
       background: var(--surface);
       border: 2px dashed var(--border);
       border-radius: 10px;
       color: var(--muted);
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
+      font-family: 'Inter', sans-serif; font-size: 13px;
       padding: 18px 14px;
-      cursor: pointer;
-      outline: none;
-      margin-bottom: 16px;
+      cursor: pointer; outline: none; margin-bottom: 16px;
       transition: border-color .2s, background .2s;
     }
     #upload-file:hover,
     #upload-file:focus { border-color: var(--teal); background: rgba(0,207,200,.03); }
 
-    /* ── two-col form row ──────────────────────────────────── */
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    /* ── buttons ───────────────────────────────────────────── */
+    /* buttons */
     .btn {
       display: inline-flex; align-items: center; gap: 6px;
-      background: var(--teal);
-      color: #0b1523;
+      background: var(--teal); color: #0b1523;
       border: none; border-radius: 8px;
       font-family: 'Inter', sans-serif;
       font-size: 13px; font-weight: 600;
       padding: 10px 20px;
-      cursor: pointer;
+      cursor: pointer; white-space: nowrap;
       transition: opacity .2s, transform .15s;
-      white-space: nowrap;
     }
     .btn:hover  { opacity: .88; transform: translateY(-1px); }
     .btn:active { opacity: 1;   transform: none; }
-    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
-    .btn-secondary {
+    .btn-ghost {
       background: transparent;
       border: 1px solid var(--border);
       color: var(--muted);
     }
-    .btn-secondary:hover { border-color: var(--teal); color: var(--teal); opacity: 1; }
+    .btn-ghost:hover { border-color: var(--teal); color: var(--teal); opacity: 1; }
 
-    /* ── result boxes ──────────────────────────────────────── */
+    /* result boxes */
     .result-box {
-      margin-top: 14px;
-      font-size: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--muted);
-      min-height: 20px;
-      word-break: break-all;
+      margin-top: 12px;
+      font-size: 12px; font-family: 'JetBrains Mono', monospace;
+      color: var(--muted); min-height: 20px; word-break: break-all;
     }
     .result-box.success { color: var(--ok-fg); }
     .result-box.error   { color: var(--error-fg); }
 
-    /* ── template section ──────────────────────────────────── */
+    /* status codes helper */
+    .status-hint {
+      margin-top: 10px;
+      font-size: 11px; color: var(--muted);
+      line-height: 1.8;
+    }
+    .status-hint code {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--teal); font-size: 11px;
+    }
+
+    /* template bar */
     .template-bar {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 20px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 16px;
+      margin-left: 68px;
     }
-    .template-bar-info { }
     .template-bar-info strong { font-size: 13px; color: var(--text); font-weight: 600; }
-    .template-bar-info p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .template-bar-info p      { font-size: 12px; color: var(--muted); margin-top: 3px; }
 
-    /* ── responsive ────────────────────────────────────────── */
+    /* responsive */
     @media (max-width: 768px) {
       header { padding: 0 20px; }
       .brand-tag { display: none; }
       main { padding: 24px 16px 48px; }
-      .card-row { grid-template-columns: 1fr; }
-      .form-row  { grid-template-columns: 1fr; }
-      .template-bar { flex-direction: column; align-items: flex-start; }
+      .step { grid-template-columns: 1fr; }
+      .step-num { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+      .template-bar { margin-left: 0; flex-direction: column; align-items: flex-start; }
     }
-
     @media (max-width: 480px) {
       nav a:not(.active) { display: none; }
-      .card { padding: 20px; }
+      .card { padding: 16px; }
     }
   </style>
 </head>
@@ -258,10 +253,10 @@
   <div class="pulse-bar"></div>
 
   <header>
-    <div class="brand">
+    <a class="brand" href="/downloads" id="home-link">
       <span class="logo">AgentFlow</span>
       <span class="brand-tag">Hub</span>
-    </div>
+    </a>
     <nav>
       <a href="/login">Login</a>
       <a href="/dashboard">Dashboard</a>
@@ -271,88 +266,127 @@
 
   <main>
     <div class="page-header">
-      <h1>Upload &amp; Templates</h1>
-      <p>Manage insurers, create commission reports, and submit validated XLSX files.</p>
+      <h1>Manual Import</h1>
+      <p>Register a custom insurer, create a commission report, then upload a filled XLSX file.</p>
     </div>
 
-    <!-- ── Top row: Manufacturer | File Upload ───────────── -->
-    <div class="card-row">
-
-      <!-- Card A: Manufacturer -->
+    <!-- ── Step 1: Register Insurer ────────────────────────── -->
+    <div class="step">
+      <div class="step-num">1</div>
       <div class="card">
-        <div class="card-title">Register Insurer <span>Card A</span></div>
+        <div class="card-title">Register Custom Insurer</div>
+        <div class="card-desc">
+          Create an insurer that doesn't have an automated crawler yet.
+          You'll need the ID it returns to create a report below.
+        </div>
 
-        <label for="manufacturer-name">Insurer name</label>
-        <input id="manufacturer-name" type="text" placeholder="e.g. מנורה מבטחים" />
+        <div class="form-row">
+          <div>
+            <label for="manufacturer-name">Insurer name</label>
+            <input id="manufacturer-name" type="text" placeholder="e.g. מנורה מבטחים" />
+          </div>
+          <div>
+            <label for="manufacturer-color">Brand colour</label>
+            <input id="manufacturer-color" type="color" value="#00cfc8" />
+          </div>
+        </div>
 
-        <label for="manufacturer-color">Brand colour</label>
-        <input id="manufacturer-color" type="color" value="#00cfc8" />
-
-        <button id="create-manufacturer-btn" class="btn">Create Insurer</button>
+        <button id="create-manufacturer-btn" class="btn">Register Insurer</button>
         <div id="manufacturer-result" class="result-box"></div>
       </div>
+    </div>
 
-      <!-- Card B: File Upload -->
+    <!-- ── Step 2: Create Report ────────────────────────────── -->
+    <div class="step">
+      <div class="step-num">2</div>
       <div class="card">
-        <div class="card-title">File Intake &amp; Validation <span>Card B</span></div>
+        <div class="card-title">Create Commission Report</div>
+        <div class="card-desc">
+          Attach a report to the insurer you just created. The branch and category
+          define which Excel template columns apply.
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label for="report-manufacturer-id">Insurer ID</label>
+            <input id="report-manufacturer-id" type="text" placeholder="MFR-XXXXXXXX" />
+          </div>
+          <div>
+            <label for="report-branch">Branch</label>
+            <select id="report-branch">
+              <option value="">Select branch…</option>
+              <option value="Life &amp; Finance">Life &amp; Finance</option>
+              <option value="Elementary">Elementary</option>
+              <option value="Travel">Travel</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label for="report-name">Report name</label>
+            <input id="report-name" type="text" placeholder="e.g. Q2-2025 Life" />
+          </div>
+          <div>
+            <label for="report-category">Default category</label>
+            <select id="report-category">
+              <option value="">Select category…</option>
+              <option value="life">Life</option>
+              <option value="health">Health</option>
+              <option value="pension">Pension</option>
+              <option value="property">Property</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="create-report-btn" class="btn">Create Report</button>
+        <div id="report-result" class="result-box"></div>
+      </div>
+    </div>
+
+    <!-- ── Step 3: Upload File ──────────────────────────────── -->
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="card">
+        <div class="card-title">Upload Commission File</div>
+        <div class="card-desc">
+          Upload a completed XLSX file. Every row must have valid <code style="font-family:JetBrains Mono,monospace;font-size:12px;color:var(--teal)">month</code> (MM-YYYY),
+          <code style="font-family:JetBrains Mono,monospace;font-size:12px;color:var(--teal)">policy_id</code>, and
+          <code style="font-family:JetBrains Mono,monospace;font-size:12px;color:var(--teal)">category</code> columns.
+          One invalid row rejects the entire file.
+        </div>
+
+        <label for="upload-insurer">Insurer name <span style="color:var(--muted);font-weight:400;text-transform:none">(for dashboard)</span></label>
+        <input id="upload-insurer" type="text" placeholder="e.g. מנורה מבטחים — optional, links upload to commission ledger" />
 
         <label for="upload-file">Commission XLSX file</label>
         <input id="upload-file" type="file" accept=".xlsx" />
 
         <button id="upload-btn" class="btn">Upload &amp; Validate</button>
         <div id="upload-result" class="result-box"></div>
+
+        <div class="status-hint">
+          <code>50</code> Success &nbsp;·&nbsp;
+          <code>61</code> Empty file &nbsp;·&nbsp;
+          <code>67</code> Bad format / duplicate &nbsp;·&nbsp;
+          <code>70</code> Bad month format
+        </div>
       </div>
     </div>
 
-    <!-- ── Create Report card ─────────────────────────────── -->
-    <div class="card" style="margin-bottom: 24px;">
-      <div class="card-title">Create Commission Report</div>
-
-      <div class="form-row">
-        <div>
-          <label for="report-manufacturer-id">Insurer ID</label>
-          <input id="report-manufacturer-id" type="text" placeholder="MFR-XXXXXX" />
-        </div>
-        <div>
-          <label for="report-branch">Branch</label>
-          <select id="report-branch">
-            <option value="">Select branch…</option>
-            <option value="Life &amp; Finance">Life &amp; Finance</option>
-            <option value="Elementary">Elementary</option>
-            <option value="Travel">Travel</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div>
-          <label for="report-name">Report name</label>
-          <input id="report-name" type="text" placeholder="e.g. Q2-2025 Life" />
-        </div>
-        <div>
-          <label for="report-category">Category</label>
-          <input id="report-category" type="text" placeholder="life / health / pension / property" />
-        </div>
-      </div>
-
-      <button id="create-report-btn" class="btn">Create Report</button>
-      <div id="report-result" class="result-box"></div>
-    </div>
-
-    <!-- ── Template download ──────────────────────────────── -->
+    <!-- ── Template download ──────────────────────────────────────── -->
     <div class="template-bar">
       <div class="template-bar-info">
         <strong>Excel Upload Template</strong>
-        <p>Download the official column-schema template before submitting commission files.</p>
+        <p>Download the column-schema template before filling in commission data.</p>
       </div>
-      <a id="download-template-btn" href="/api/upload/template" download class="btn btn-secondary">
+      <a id="download-template-btn" href="/api/upload/template" download class="btn btn-ghost">
         ⬇ Download Template
       </a>
     </div>
   </main>
 
   <script>
-    // ── environment ──────────────────────────────────────────
     var isGitHubPages = window.location.hostname.includes('github.io');
 
     var NAV = {
@@ -361,25 +395,26 @@
       '/downloads': isGitHubPages ? './downloads.html' : '/downloads',
     };
 
-    document.querySelectorAll('nav a[href]').forEach(function(a) {
+    document.querySelectorAll('nav a[href], #home-link').forEach(function(a) {
       var k = a.getAttribute('href');
       if (NAV[k]) a.href = NAV[k];
     });
 
-    // ── helpers ──────────────────────────────────────────────
+    if (isGitHubPages) {
+      document.getElementById('home-link').href = './index.html';
+    }
+
     function setResult(el, text, type) {
       el.textContent = text;
       el.className   = 'result-box ' + (type || '');
     }
 
-    // ── manufacturer creation ────────────────────────────────
+    // ── Step 1: Register Insurer ──────────────────────────────
     document.getElementById('create-manufacturer-btn').addEventListener('click', async function() {
       var nameEl   = document.getElementById('manufacturer-name');
       var colorEl  = document.getElementById('manufacturer-color');
       var resultEl = document.getElementById('manufacturer-result');
-
-      var name  = nameEl.value.trim();
-      var color = colorEl.value;
+      var name     = nameEl.value.trim();
       if (!name) { setResult(resultEl, 'Insurer name is required.', 'error'); return; }
 
       if (isGitHubPages) {
@@ -389,26 +424,26 @@
       }
 
       try {
-        var res = await fetch('/api/manufacturer', {
+        var res  = await fetch('/api/manufacturer', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: name, iconColor: color }),
+          body: JSON.stringify({ name: name, iconColor: colorEl.value }),
         });
         var data = await res.json();
         if (res.ok) {
           setResult(resultEl, 'Created — ID: ' + data.id, 'success');
         } else {
-          setResult(resultEl, data.error || 'Error creating insurer.', 'error');
+          setResult(resultEl, data.error || 'Error registering insurer.', 'error');
         }
       } catch (_) {
         setResult(resultEl, 'Error: could not reach server.', 'error');
       }
     });
 
-    // ── report creation ──────────────────────────────────────
+    // ── Step 2: Create Report ─────────────────────────────────
     document.getElementById('create-report-btn').addEventListener('click', async function() {
       var mfrId    = document.getElementById('report-manufacturer-id').value.trim();
-      var branch   = document.getElementById('report-branch').value.trim();
+      var branch   = document.getElementById('report-branch').value;
       var name     = document.getElementById('report-name').value.trim();
       var category = document.getElementById('report-category').value;
       var resultEl = document.getElementById('report-result');
@@ -425,7 +460,7 @@
       }
 
       try {
-        var res = await fetch('/api/report', {
+        var res  = await fetch('/api/report', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ manufacturerId: mfrId, branch: branch, name: name, category: category }),
@@ -441,38 +476,48 @@
       }
     });
 
-    // ── file upload ──────────────────────────────────────────
+    // ── Step 3: Upload File ───────────────────────────────────
     document.getElementById('upload-btn').addEventListener('click', async function() {
-      var fileEl   = document.getElementById('upload-file');
-      var resultEl = document.getElementById('upload-result');
-      var file     = fileEl.files && fileEl.files[0];
+      var fileEl    = document.getElementById('upload-file');
+      var insurerEl = document.getElementById('upload-insurer');
+      var resultEl  = document.getElementById('upload-result');
+      var file      = fileEl.files && fileEl.files[0];
 
       if (!file) { setResult(resultEl, 'Please select an XLSX file.', 'error'); return; }
 
       if (isGitHubPages) {
-        setResult(resultEl, 'Status: 50', 'success');
+        setResult(resultEl, 'Status: 50 — Success', 'success');
         return;
       }
 
       try {
         var formData = new FormData();
         formData.append('file', file);
+        if (insurerEl.value.trim()) {
+          formData.append('manufacturer', insurerEl.value.trim());
+        }
         var res  = await fetch('/api/upload', { method: 'POST', body: formData });
         var data = await res.json();
-        setResult(resultEl, 'Status: ' + (data.status !== undefined ? data.status : res.status), res.ok ? 'success' : 'error');
+        var s    = data.status;
+        var labels = { 50: 'Success', 61: 'Empty file — no data rows', 67: 'Bad format or duplicate file', 70: 'Bad month format (expected MM-YYYY)' };
+        var label  = labels[s] || ('Status ' + s);
+        setResult(resultEl, 'Status: ' + s + ' — ' + label, s === 50 ? 'success' : 'error');
+        if (s === 50) {
+          setResult(resultEl, 'Status: 50 — Success · Commission data added to Dashboard', 'success');
+        }
       } catch (_) {
         setResult(resultEl, 'Error: could not reach server.', 'error');
       }
     });
 
-    // ── template download — disable on GitHub Pages ──────────
+    // ── Template download — disable on GitHub Pages ───────────
     if (isGitHubPages) {
       var tmplBtn = document.getElementById('download-template-btn');
       tmplBtn.removeAttribute('href');
       tmplBtn.removeAttribute('download');
       tmplBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        alert('Template download requires a live server. Clone the repo and run npm run server.');
+        alert('Template download requires a live server.\nRun: npm run server');
       });
     }
   </script>
