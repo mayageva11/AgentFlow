@@ -10,7 +10,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # required for peaceiris/actions-gh-pages to push gh-pages branch
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
 
     steps:
       - name: Checkout
@@ -62,18 +68,17 @@ jobs:
       - name: Build GitHub Pages site
         if: always()
         run: |
-          # allure-report may be empty if generate failed; guard so Pages deploy always succeeds
           mkdir -p gh-pages/report allure-report
           cp -r allure-report/. gh-pages/report/
           cp src/pages/landing.html   gh-pages/index.html
           cp src/pages/login.html     gh-pages/login.html
           cp src/pages/dashboard.html gh-pages/dashboard.html
           cp src/pages/downloads.html gh-pages/downloads.html
-          # Embed pre-generated Claude API data so the static dashboard has content
           if [ -f dist/static/dashboard.json ]; then
             mkdir -p gh-pages/data
             cp dist/static/dashboard.json gh-pages/data/dashboard.json
           fi
+          touch gh-pages/.nojekyll
 
       - name: Upload Allure report artifact
         if: always()
@@ -83,9 +88,13 @@ jobs:
           path: gh-pages/report/
           retention-days: 30
 
+      - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./gh-pages
+
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./gh-pages
+        id: deploy
+        uses: actions/deploy-pages@v4
