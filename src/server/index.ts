@@ -33,13 +33,16 @@ app.post('/api/login', (req, res) => {
   }
 });
 
+const DASHBOARD_DEMO = [
+  { manufacturer: 'מנורה מבטחים', month: '06-2025', category: 'life',     totalCommission: 128400, policyCount: 87,  status: 'processed' },
+  { manufacturer: 'הפניקס ביטוח', month: '06-2025', category: 'health',   totalCommission: 94250,  policyCount: 63,  status: 'processed' },
+  { manufacturer: 'הראל ביטוח',   month: '05-2025', category: 'pension',  totalCommission: 211800, policyCount: 142, status: 'processed' },
+  { manufacturer: 'מגדל ביטוח',   month: '05-2025', category: 'property', totalCommission: 67900,  policyCount: 44,  status: 'pending'   },
+  { manufacturer: 'כלל ביטוח',    month: '04-2025', category: 'life',     totalCommission: 154600, policyCount: 103, status: 'processed' },
+];
+
 app.get('/api/dashboard', (_req, res) => {
-  const { manufacturers, reports, uploadHistory } = require('./state') as typeof import('./state');
-  res.json({
-    manufacturers: manufacturers.size,
-    reports:       reports.size,
-    uploads:       uploadHistory.slice(0, 10),
-  });
+  res.json(DASHBOARD_DEMO);
 });
 
 app.use('/api/manufacturer', manufacturerRouter);
