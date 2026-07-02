@@ -33,6 +33,7 @@
     "status50": { "status": 50 },
     "status61": { "status": 61 },
     "status67": { "status": 67 },
+    "status67_invalidCategory": { "status": 67, "reason": "invalid_category" },
     "status70": { "status": 70 }
   }
 }

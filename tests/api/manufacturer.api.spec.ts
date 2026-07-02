@@ -2,6 +2,10 @@ import { test, expect } from '../fixtures/testBase';
 import mockData from '../mockData.json';
 
 test('create manufacturer — returns id with MFR- prefix', async ({ page }) => {
+  await page.route('**/api/manufacturer', route =>
+    route.fulfill({ json: mockData.manufacturer.success })
+  );
+
   const body = await page.evaluate(async () => {
     const res = await fetch('/api/manufacturer', {
       method: 'POST',

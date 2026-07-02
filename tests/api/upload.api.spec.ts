@@ -48,13 +48,13 @@ test('one bad row in otherwise valid file — entire file rejected with status 6
     return res.json();
   });
 
+  // all-or-nothing: a single bad row rejects the entire file
   expect(result.status).toBe(67);
 });
 
 test('file with invalid category value — returns status 67', async ({ page }) => {
-  // Allowed values: life | health | pension | property. Anything else → 67.
   await page.route('**/api/upload', route =>
-    route.fulfill({ json: mockData.upload.status67 })
+    route.fulfill({ json: mockData.upload.status67_invalidCategory })
   );
 
   const result = await page.evaluate(async () => {
@@ -62,6 +62,7 @@ test('file with invalid category value — returns status 67', async ({ page }) 
     return res.json();
   });
 
+  // category must be one of: life | health | pension | property
   expect(result.status).toBe(67);
 });
 
