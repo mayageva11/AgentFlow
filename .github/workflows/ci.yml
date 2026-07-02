@@ -35,7 +35,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Wait for server
-        run: npx wait-on http://localhost:4000/health --timeout 10000
+        run: npx wait-on http://127.0.0.1:4000/health --timeout 30000
 
       - name: Run tests
         run: npm test
@@ -43,16 +43,30 @@ jobs:
           CI: true
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
+      # allure@3.x (installed by allure-playwright) removed --clean; pre-delete output dir instead
       - name: Generate Allure report
         if: always()
-        run: npx allure generate allure-results --clean -o allure-report
+        run: |
+          mkdir -p allure-results
+          rm -rf allure-report
+          npx allure generate allure-results -o allure-report
+
+      - name: Build GitHub Pages site
+        if: always()
+        run: |
+          mkdir -p gh-pages/report
+          cp -r allure-report/. gh-pages/report/
+          cp src/pages/landing.html  gh-pages/index.html
+          cp src/pages/login.html    gh-pages/login.html
+          cp src/pages/dashboard.html gh-pages/dashboard.html
+          cp src/pages/downloads.html gh-pages/downloads.html
 
       - name: Upload Allure report artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
-          path: allure-report/
+          path: gh-pages/report/
           retention-days: 30
 
       - name: Deploy to GitHub Pages
@@ -60,4 +74,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./allure-report
+          publish_dir: ./gh-pages
