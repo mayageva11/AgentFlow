@@ -76,13 +76,11 @@ jobs:
           path: gh-pages/report/
           retention-days: 30
 
-      - name: Upload site artifact for deployment
+      - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: gh-pages-site
-          path: gh-pages/
-          retention-days: 1
+          path: ./gh-pages
 
   # ── Job 2: deploy to GitHub Pages (main branch only) ─────────────────────
   deploy:
@@ -90,18 +88,13 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
 
     steps:
-      - name: Download built site
-        uses: actions/download-artifact@v4
-        with:
-          name: gh-pages-site
-          path: gh-pages
-
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./gh-pages
-          force_orphan: true
+        id: deploy
+        uses: actions/deploy-pages@v4
