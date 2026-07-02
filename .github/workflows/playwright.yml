@@ -7,14 +7,17 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  test-and-deploy:
+  # ── Job 1: test + build ───────────────────────────────────────────────────
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -56,9 +59,7 @@ jobs:
           cp src/pages/login.html     gh-pages/login.html
           cp src/pages/dashboard.html gh-pages/dashboard.html
           touch gh-pages/.nojekyll
-          # Root redirects to the Allure test report
           printf '<meta http-equiv="refresh" content="0;url=report/index.html" />\n' > gh-pages/index.html
-          # Pre-built sample data so the dashboard works without a running server
           cat > gh-pages/data/dashboard.json << 'JSONEOF'
           [
             {"manufacturer":"מנורה מבטחים","month":"06-2025","category":"life","totalCommission":128400,"policyCount":87,"status":"processed"},
@@ -77,10 +78,22 @@ jobs:
           path: gh-pages/report/
           retention-days: 30
 
-      - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Upload Pages artifact
+        if: always()
+        uses: actions/upload-pages-artifact@v3
         with:
-          folder: gh-pages
-          branch: gh-pages
-          clean: true
+          path: gh-pages/
+
+  # ── Job 2: deploy (main branch only) ─────────────────────────────────────
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
