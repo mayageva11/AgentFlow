@@ -3,349 +3,357 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AgentFlow — Dashboard</title>
+  <title>AgentFlow Hub — Commission Ledger</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --navy: #0D1B2A;
-      --teal: #00D4D4;
-      --surface: #112233;
-      --border: #1e3448;
-      --text: #c8d8e8;
-      --muted: #6b8299;
+      --bg:       #0b1523;
+      --surface:  #111e30;
+      --card:     #16253a;
+      --border:   #1f3452;
+      --teal:     #00cfc8;
+      --teal-lo:  rgba(0,207,200,.08);
+      --text:     #ccdaec;
+      --muted:    #607a97;
+      --error-bg: rgba(248,113,113,.08);
+      --error-fg: #f87171;
+      --ok-bg:    rgba(52,211,153,.1);
+      --ok-fg:    #34d399;
+      --warn-bg:  rgba(251,191,36,.08);
+      --warn-fg:  #fbbf24;
     }
 
     body {
-      background: var(--navy);
+      background: var(--bg);
       color: var(--text);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
-    }
-
-    .pulse-bar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--teal);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.4; box-shadow: 0 0 4px var(--teal); }
-      50%       { opacity: 1;   box-shadow: 0 0 16px var(--teal), 0 0 32px var(--teal); }
-    }
-
-    /* ── Header ─────────────────────────────────────────────── */
-    header {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 40px;
-      border-bottom: 1px solid var(--border);
+      flex-direction: column;
     }
 
+    /* ── pulse bar ─────────────────────────────────────────── */
+    .pulse-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--teal); z-index: 999;
+      animation: pbar 2.4s ease-in-out infinite;
+    }
+    @keyframes pbar {
+      0%,100% { opacity:.3; box-shadow: 0 0 6px var(--teal); }
+      50%      { opacity:1;  box-shadow: 0 0 20px var(--teal), 0 0 40px var(--teal); }
+    }
+
+    /* ── header ────────────────────────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px; padding: 0 40px;
+      background: rgba(11,21,35,.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      gap: 16px;
+    }
+
+    .brand { display: flex; align-items: baseline; gap: 8px; flex-shrink: 0; }
     .logo {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 18px;
+      font-size: 16px; color: var(--teal); letter-spacing: .05em;
+    }
+    .brand-tag { font-size: 11px; color: var(--muted); }
+
+    .header-center { flex: 1; display: flex; justify-content: center; }
+
+    .claude-badge {
+      font-size: 11px; font-weight: 600;
+      padding: 4px 12px; border-radius: 20px;
+      background: var(--teal-lo);
+      border: 1px solid rgba(0,207,200,.25);
       color: var(--teal);
-      letter-spacing: 0.04em;
       white-space: nowrap;
+      letter-spacing: .02em;
     }
 
-    .brand { display: flex; align-items: baseline; gap: 10px; }
-
-    .brand-tag {
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-      white-space: nowrap;
-    }
-
-    nav { display: flex; flex-wrap: wrap; gap: 4px; }
-
+    nav { display: flex; gap: 2px; flex-shrink: 0; }
     nav a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 13px;
-      margin-left: 20px;
-      padding: 6px 0;
-      transition: color 0.2s;
-      white-space: nowrap;
+      font-size: 13px; color: var(--muted); text-decoration: none;
+      padding: 6px 12px; border-radius: 6px;
+      transition: color .2s, background .2s;
+    }
+    nav a:hover  { color: var(--text);  background: rgba(255,255,255,.04); }
+    nav a.active { color: var(--teal);  font-weight: 600; }
+
+    /* ── main ──────────────────────────────────────────────── */
+    main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px 40px 64px;
     }
 
-    nav a:hover  { color: var(--teal); }
-    nav a.active { color: var(--teal); font-weight: 500; }
+    .page-header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header h1 {
+      font-size: 22px; font-weight: 600;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .page-header p { font-size: 13px; color: var(--muted); }
 
+    /* ── loading ───────────────────────────────────────────── */
+    #loading {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 16px;
+      padding: 80px 24px;
+      color: var(--muted); font-size: 14px;
+    }
+
+    .spinner {
+      width: 28px; height: 28px;
+      border: 2px solid var(--border);
+      border-top-color: var(--teal);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── error box ─────────────────────────────────────────── */
     #dashboard-error {
       display: none;
-      text-align: center;
-      color: #ff6b6b;
-      padding: 48px 24px;
-      font-size: 14px;
-    }
-
-    /* ── Main ───────────────────────────────────────────────── */
-    main {
-      max-width: 1000px;
-      margin: 40px auto;
-      padding: 0 24px;
-    }
-
-    h1 {
-      font-size: 20px;
-      font-weight: 500;
-      margin-bottom: 16px;
-      color: var(--text);
-    }
-
-    /* ── Claude badge ───────────────────────────────────────── */
-    .claude-badge {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: linear-gradient(135deg, rgba(0,212,212,0.08), rgba(0,212,212,0.03));
-      border: 1px solid rgba(0,212,212,0.4);
+      background: var(--error-bg);
+      border: 1px solid rgba(248,113,113,.25);
       border-radius: 10px;
-      padding: 12px 20px;
+      color: var(--error-fg);
+      font-size: 14px; font-weight: 500;
+      padding: 20px 24px;
       margin-bottom: 24px;
-      font-size: 13px;
-      color: var(--teal);
-      font-family: 'JetBrains Mono', monospace;
-      animation: badge-glow 3s ease-in-out infinite;
-      flex-wrap: wrap;
-      gap: 10px;
     }
 
-    .badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--teal);
-      flex-shrink: 0;
-      animation: dot-pulse 1.5s ease-in-out infinite;
-    }
+    /* ── reports table ─────────────────────────────────────── */
+    #reports-table { display: none; }
 
-    @keyframes badge-glow {
-      0%, 100% { box-shadow: 0 0 8px rgba(0,212,212,0.15); border-color: rgba(0,212,212,0.3); }
-      50%       { box-shadow: 0 0 24px rgba(0,212,212,0.45), 0 0 48px rgba(0,212,212,0.1); border-color: rgba(0,212,212,0.7); }
-    }
-
-    @keyframes dot-pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.4; transform: scale(0.75); }
-    }
-
-    /* ── Table ──────────────────────────────────────────────── */
     .table-wrapper {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      border-radius: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
     }
+
+    .table-meta {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-meta span { font-size: 12px; color: var(--muted); }
+    .table-meta strong { font-size: 13px; color: var(--text); font-weight: 600; }
+
+    .table-scroll { overflow-x: auto; }
 
     table {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: 'JetBrains Mono', monospace;
+      width: 100%; border-collapse: collapse;
       font-size: 13px;
-      min-width: 560px;
     }
-
-    thead th {
-      text-align: left;
-      padding: 10px 16px;
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
+    thead { background: var(--surface); }
+    th {
+      text-align: left; padding: 12px 16px;
+      font-size: 11px; font-weight: 600;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .07em;
       white-space: nowrap;
     }
+    td {
+      padding: 13px 16px;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: middle;
+    }
+    tbody tr:hover { background: rgba(255,255,255,.018); }
 
-    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
-    tbody tr:hover { background: var(--surface); }
+    td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--teal);
+    }
 
-    td { padding: 12px 16px; color: var(--text); }
-
-    .status-badge {
+    .badge {
       display: inline-block;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 500;
+      font-size: 11px; font-weight: 600;
+      padding: 3px 10px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: .04em;
     }
+    .badge-ok      { background: var(--ok-bg);   color: var(--ok-fg);   }
+    .badge-pending { background: var(--warn-bg);  color: var(--warn-fg); }
+    .badge-error   { background: var(--error-bg); color: var(--error-fg); }
 
-    .status-processed { background: rgba(0,212,212,0.12); color: var(--teal); }
-    .status-pending   { background: rgba(255,170,0,0.12);  color: #ffaa00; }
-
-    #loading {
-      text-align: center;
-      color: var(--muted);
-      padding: 48px;
-      font-size: 14px;
-    }
-
-    /* ── Responsive ─────────────────────────────────────────── */
+    /* ── responsive ────────────────────────────────────────── */
     @media (max-width: 768px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 16px 20px;
+      header { padding: 0 20px; }
+      .brand-tag { display: none; }
+      .header-center { display: none; }
+      main { padding: 24px 16px 48px; }
+
+      thead { display: none; }
+      tbody tr {
+        display: block;
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
       }
-
-      nav a:first-child { margin-left: 0; }
-
-      main { margin: 24px auto; padding: 0 16px; }
-
-      .claude-badge { font-size: 12px; padding: 10px 14px; }
-
-      h1 { font-size: 17px; }
+      td {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 4px 0; border: none; font-size: 12px;
+      }
+      td::before {
+        content: attr(data-label);
+        font-size: 10px; font-weight: 600;
+        color: var(--muted); text-transform: uppercase;
+        letter-spacing: .06em; flex-shrink: 0; margin-right: 8px;
+      }
+      td:first-child { color: var(--teal); }
     }
 
     @media (max-width: 480px) {
-      /* Stack table rows into key-value cards */
-      .table-wrapper { overflow-x: visible; border-radius: 0; }
-
-      table, thead, tbody, th, td, tr { display: block; }
-
-      thead { display: none; }
-
-      tbody tr {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        margin-bottom: 12px;
-        padding: 4px 0;
-      }
-
-      tbody tr:hover { background: var(--surface); }
-
-      td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid var(--border);
-        padding: 10px 14px;
-        font-size: 13px;
-      }
-
-      td:last-child { border-bottom: none; }
-
-      td::before {
-        content: attr(data-label);
-        font-family: 'Inter', sans-serif;
-        font-size: 10px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.07em;
-        color: var(--muted);
-        flex-shrink: 0;
-        margin-right: 12px;
-      }
+      nav a:not(.active) { display: none; }
     }
   </style>
 </head>
 <body>
   <div class="pulse-bar"></div>
+
   <header>
     <div class="brand">
       <span class="logo">AgentFlow</span>
-      <span class="brand-tag">Insurance Platform Hub</span>
+      <span class="brand-tag">Hub</span>
     </div>
+
+    <div class="header-center">
+      <div class="claude-badge" id="claude-badge">🤖 Initialising…</div>
+    </div>
+
     <nav>
       <a href="/login">Login</a>
       <a href="/dashboard" class="active">Dashboard</a>
-      <a href="/downloads">Downloads</a>
+      <a href="/downloads">Upload &amp; Templates</a>
     </nav>
   </header>
-  <main>
-    <h1>Commission Reports</h1>
 
-    <div class="claude-badge">
-      <span class="badge-dot"></span>
-      🤖 Live LLM Mock Data Active — Generated dynamically via <strong style="margin:0 4px">Claude API</strong> (claude-sonnet-4-6)
+  <main>
+    <div class="page-header">
+      <h1>Commission Ledger Audit</h1>
+      <p>Insurance commission data — current reporting period</p>
     </div>
 
-    <div id="loading">Loading reports…</div>
-    <div id="dashboard-error">Service unavailable — please try again later.</div>
+    <div id="loading">
+      <div class="spinner"></div>
+      <span>Fetching commission ledger…</span>
+    </div>
 
-    <div class="table-wrapper">
-      <table id="reports-table" style="display:none">
-        <thead>
-          <tr>
-            <th>Manufacturer</th>
-            <th>Month</th>
-            <th>Total Commission</th>
-            <th>Policy Count</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="reports-body"></tbody>
-      </table>
+    <div id="dashboard-error">Error: Enterprise API Connection Failure (500)</div>
+
+    <div id="reports-table">
+      <div class="table-wrapper">
+        <div class="table-meta">
+          <strong>Commission Records</strong>
+          <span id="row-count"></span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Insurer</th>
+                <th>Month</th>
+                <th>Category</th>
+                <th>Commission (₪)</th>
+                <th>Policies</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="reports-body"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </main>
+
   <script>
-    function formatCurrency(n) {
-      return '₪' + n.toLocaleString('he-IL');
+    // ── environment ──────────────────────────────────────────
+    const isGitHubPages = window.location.hostname.includes('github.io');
+
+    const NAV = {
+      '/login':     isGitHubPages ? './login.html'     : '/login',
+      '/dashboard': isGitHubPages ? './dashboard.html' : '/dashboard',
+      '/downloads': isGitHubPages ? './downloads.html' : '/downloads',
+    };
+
+    document.querySelectorAll('nav a[href]').forEach(function(a) {
+      var k = a.getAttribute('href');
+      if (NAV[k]) a.href = NAV[k];
+    });
+
+    document.getElementById('claude-badge').textContent = isGitHubPages
+      ? '🤖 Static Demo Sandbox'
+      : '🤖 Live Server Core Active';
+
+    // ── demo data ────────────────────────────────────────────
+    var DEMO_REPORTS = [
+      { manufacturer: 'מנורה מבטחים',  month: '06-2025', category: 'life',     totalCommission: 128400, policyCount: 87,  status: 'processed' },
+      { manufacturer: 'הפניקס ביטוח',  month: '06-2025', category: 'health',   totalCommission: 94250,  policyCount: 63,  status: 'processed' },
+      { manufacturer: 'הראל ביטוח',    month: '05-2025', category: 'pension',  totalCommission: 211800, policyCount: 142, status: 'processed' },
+      { manufacturer: 'מגדל ביטוח',    month: '05-2025', category: 'property', totalCommission: 67900,  policyCount: 44,  status: 'pending'   },
+      { manufacturer: 'כלל ביטוח',     month: '04-2025', category: 'life',     totalCommission: 154600, policyCount: 103, status: 'processed' },
+    ];
+
+    // ── row renderer ─────────────────────────────────────────
+    function renderRow(r) {
+      var tr = document.createElement('tr');
+      var statusMap = { processed: 'badge-ok', pending: 'badge-pending', error: 'badge-error' };
+      var cls = statusMap[r.status] || 'badge-pending';
+      tr.innerHTML =
+        '<td data-label="Insurer">'     + (r.manufacturer || '—')                             + '</td>' +
+        '<td data-label="Month">'       + (r.month || '—')                                    + '</td>' +
+        '<td data-label="Category">'    + (r.category || '—')                                 + '</td>' +
+        '<td data-label="Commission">₪' + Number(r.totalCommission || 0).toLocaleString()    + '</td>' +
+        '<td data-label="Policies">'    + (r.policyCount || 0)                                + '</td>' +
+        '<td data-label="Status"><span class="badge ' + cls + '">' + (r.status || '—') + '</span></td>';
+      return tr;
     }
 
-    function renderRow(report) {
-      return `<tr>
-        <td data-label="Manufacturer">${report.manufacturer}</td>
-        <td data-label="Month">${report.month}</td>
-        <td data-label="Total Commission">${formatCurrency(report.totalCommission)}</td>
-        <td data-label="Policy Count">${report.policyCount}</td>
-        <td data-label="Status"><span class="status-badge status-${report.status}">${report.status}</span></td>
-      </tr>`;
-    }
-
+    // ── loader ───────────────────────────────────────────────
     async function loadReports() {
-      const loadingEl = document.getElementById('loading');
-      const errorEl   = document.getElementById('dashboard-error');
+      var loadingEl = document.getElementById('loading');
+      var errorEl   = document.getElementById('dashboard-error');
+      var tableEl   = document.getElementById('reports-table');
+      var bodyEl    = document.getElementById('reports-body');
+      var countEl   = document.getElementById('row-count');
+
+      loadingEl.style.display = 'flex';
+      errorEl.style.display   = 'none';
+      tableEl.style.display   = 'none';
+
+      if (isGitHubPages) {
+        DEMO_REPORTS.forEach(function(r) { bodyEl.appendChild(renderRow(r)); });
+        countEl.textContent     = DEMO_REPORTS.length + ' records';
+        tableEl.style.display   = 'block';
+        loadingEl.style.display = 'none';
+        return;
+      }
 
       try {
-        const res = await fetch('/api/dashboard');
-
-        if (res.status >= 500) {
-          // Explicit server error — show message, do not attempt static fallback
-          loadingEl.style.display = 'none';
-          errorEl.style.display   = 'block';
-          return;
-        }
-
-        if (res.ok) {
-          const reports = await res.json();
-          loadingEl.style.display = 'none';
-          if (reports.length) {
-            document.getElementById('reports-body').innerHTML = reports.map(renderRow).join('');
-            document.getElementById('reports-table').style.display = 'table';
-          }
-          return;
-        }
-        // 4xx / backend not present → fall through to static file
-      } catch { /* network error → fall through to static file */ }
-
-      // Static fallback for GitHub Pages (pre-generated by CI)
-      try {
-        const res = await fetch('./data/dashboard.json');
-        if (res.ok) {
-          const reports = await res.json();
-          loadingEl.style.display = 'none';
-          if (reports.length) {
-            document.getElementById('reports-body').innerHTML = reports.map(renderRow).join('');
-            document.getElementById('reports-table').style.display = 'table';
-          }
-          return;
-        }
-      } catch { /* ignore */ }
-
-      loadingEl.style.display = 'none';
+        var res = await fetch('/api/dashboard');
+        if (!res.ok) throw new Error(String(res.status));
+        var data = await res.json();
+        var rows = Array.isArray(data) && data.length > 0 ? data : DEMO_REPORTS;
+        rows.forEach(function(r) { bodyEl.appendChild(renderRow(r)); });
+        countEl.textContent   = rows.length + ' records';
+        tableEl.style.display = 'block';
+      } catch (_) {
+        errorEl.style.display = 'block';
+      } finally {
+        loadingEl.style.display = 'none';
+      }
     }
 
     loadReports();
