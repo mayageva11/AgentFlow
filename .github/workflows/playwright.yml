@@ -6,20 +6,15 @@ on:
   pull_request:
     branches: [main]
 
-# Permissions required for actions/deploy-pages OIDC token exchange
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# Only one deployment at a time; cancel any in-progress on new push
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  # ── Job 1: test, build, upload Pages artifact ─────────────────────────
-  test:
+  test-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -41,7 +36,6 @@ jobs:
       - name: Generate fixtures
         run: npm run generate:fixtures
 
-      # webServer in playwright.config.ts manages the Express server lifecycle
       - name: Run tests
         run: npm test
         env:
@@ -54,7 +48,6 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
-      # allure@3.x removed --clean; pre-delete the output directory instead
       - name: Generate Allure report
         if: always()
         run: |
@@ -62,7 +55,7 @@ jobs:
           rm -rf allure-report
           npx allure generate allure-results -o allure-report
 
-      - name: Build GitHub Pages site
+      - name: Build site
         if: always()
         run: |
           mkdir -p gh-pages/report allure-report
@@ -85,22 +78,13 @@ jobs:
           path: gh-pages/report/
           retention-days: 30
 
-      - name: Upload Pages artifact
+      - name: Deploy to gh-pages
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./gh-pages
-
-  # ── Job 2: deploy (main branch only) ──────────────────────────────────
-  deploy:
-    needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deploy
-        uses: actions/deploy-pages@v4
+        run: |
+          cd gh-pages
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Deploy ${GITHUB_SHA::7}"
+          git push -f https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:gh-pages
