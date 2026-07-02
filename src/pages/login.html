@@ -9,199 +9,56 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:      #0b1523;
-      --surface: #111e30;
-      --card:    #16253a;
-      --border:  #1f3452;
-      --teal:    #00cfc8;
-      --teal-lo: rgba(0,207,200,.08);
-      --text:    #ccdaec;
-      --muted:   #607a97;
-      --error:   #f87171;
+      --bg: #0b1523; --surface: #111e30; --card: #16253a; --border: #1f3452;
+      --teal: #00cfc8; --teal-lo: rgba(0,207,200,.08);
+      --text: #ccdaec; --muted: #607a97; --error: #f87171;
     }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .pulse-bar {
-      position: fixed; top: 0; left: 0; right: 0; height: 2px;
-      background: var(--teal);
-      animation: pbar 2.4s ease-in-out infinite;
-      z-index: 999;
-    }
-    @keyframes pbar {
-      0%,100% { opacity:.35; box-shadow: 0 0 6px var(--teal); }
-      50%      { opacity:1;   box-shadow: 0 0 20px var(--teal), 0 0 40px var(--teal); }
-    }
-
-    header {
-      position: sticky; top: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 56px; padding: 0 40px;
-      background: rgba(11,21,35,.85);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-    }
-
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    .pulse-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: var(--teal); animation: pbar 2.4s ease-in-out infinite; z-index: 999; }
+    @keyframes pbar { 0%,100% { opacity:.35; box-shadow: 0 0 6px var(--teal); } 50% { opacity:1; box-shadow: 0 0 20px var(--teal), 0 0 40px var(--teal); } }
+    header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 40px; background: rgba(11,21,35,.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
     .brand { display: flex; align-items: baseline; gap: 8px; text-decoration: none; }
     .logo  { font-family: 'JetBrains Mono', monospace; font-size: 16px; color: var(--teal); letter-spacing: .05em; }
     .brand-tag { font-size: 11px; color: var(--muted); }
-
     nav { display: flex; gap: 2px; }
-    nav a {
-      font-size: 13px; color: var(--muted); text-decoration: none;
-      padding: 6px 12px; border-radius: 6px;
-      transition: color .2s, background .2s;
-    }
-    nav a:hover  { color: var(--text); background: rgba(255,255,255,.04); }
+    nav a { font-size: 13px; color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 6px; transition: color .2s, background .2s; }
+    nav a:hover { color: var(--text); background: rgba(255,255,255,.04); }
     nav a.active { color: var(--teal); font-weight: 600; }
-
-    .page-center {
-      flex: 1; display: flex;
-      align-items: center; justify-content: center;
-      padding: 48px 16px;
-    }
-
-    .auth-card {
-      width: 100%; max-width: 420px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 44px 40px;
-      box-shadow: 0 24px 64px rgba(0,0,0,.45);
-    }
-
-    .auth-card h2 { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-    .auth-card .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
-
-    label {
-      display: block; font-size: 11px; font-weight: 600;
-      color: var(--muted); text-transform: uppercase;
-      letter-spacing: .08em; margin-bottom: 6px;
-    }
-
-    input[type="email"],
-    input[type="password"] {
-      width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
-      padding: 11px 14px;
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-      margin-bottom: 18px;
-    }
-    input[type="email"]:focus,
-    input[type="password"]:focus {
-      border-color: var(--teal);
-      box-shadow: 0 0 0 3px rgba(0,207,200,.14);
-    }
-
-    button[type="submit"] {
-      width: 100%;
-      background: var(--teal);
-      color: #0b1523;
-      border: none; border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px; font-weight: 600;
-      padding: 13px;
-      cursor: pointer;
-      transition: opacity .2s, transform .15s;
-      margin-top: 4px;
-    }
-    button[type="submit"]:hover  { opacity: .88; transform: translateY(-1px); }
-    button[type="submit"]:active { opacity: 1;   transform: none; }
+    .page-center { flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px 16px; }
+    .auth-card { width: 100%; max-width: 420px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 44px 40px; box-shadow: 0 24px 64px rgba(0,0,0,.45); }
+    .auth-card h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+    label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+    input[type="email"], input[type="password"] { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 14px; padding: 11px 14px; outline: none; transition: border-color .2s, box-shadow .2s; margin-bottom: 18px; }
+    input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,207,200,.14); }
+    button[type="submit"] { width: 100%; background: var(--teal); color: #0b1523; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; padding: 13px; cursor: pointer; transition: opacity .2s, transform .15s; margin-top: 4px; }
+    button[type="submit"]:hover { opacity: .88; transform: translateY(-1px); }
     button[type="submit"]:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-
-    #error-msg {
-      color: var(--error); font-size: 13px;
-      text-align: center; margin-top: 12px; min-height: 18px;
-    }
-
-    .demo-section {
-      margin-top: 28px;
-      border-top: 1px solid var(--border);
-      padding-top: 20px;
-    }
-    .demo-label {
-      font-size: 10px; font-weight: 600;
-      color: var(--muted); text-transform: uppercase;
-      letter-spacing: .08em; margin-bottom: 10px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .demo-label::after {
-      content: ''; flex: 1;
-      border-top: 1px solid var(--border);
-    }
-
-    .demo-user {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: border-color .2s, background .2s;
-    }
+    #error-msg { color: var(--error); font-size: 13px; text-align: center; margin-top: 12px; min-height: 18px; }
+    .demo-section { margin-top: 28px; border-top: 1px solid var(--border); padding-top: 20px; }
+    .demo-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .demo-label::after { content: ''; flex: 1; border-top: 1px solid var(--border); }
+    .demo-user { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; cursor: pointer; transition: border-color .2s, background .2s; }
     .demo-user:hover { border-color: var(--teal); background: var(--teal-lo); }
     .demo-user:last-child { margin-bottom: 0; }
-
-    .demo-user-info { flex: 1; min-width: 0; }
-    .demo-user-email {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px; color: var(--text);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
+    .demo-user-email { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
     .demo-user-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-    .demo-use-btn {
-      font-size: 11px; font-weight: 600;
-      color: var(--teal);
-      background: var(--teal-lo);
-      border: 1px solid rgba(0,207,200,.25);
-      border-radius: 6px;
-      padding: 4px 10px;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: background .2s;
-      flex-shrink: 0;
-    }
-    .demo-user:hover .demo-use-btn { background: rgba(0,207,200,.18); }
-
-    @media (max-width: 768px) {
-      header { padding: 0 20px; }
-      .brand-tag { display: none; }
-    }
-    @media (max-width: 480px) {
-      .auth-card { padding: 32px 22px; }
-      input[type="email"], input[type="password"] { font-size: 16px; }
-    }
+    .demo-use-btn { font-size: 11px; font-weight: 600; color: var(--teal); background: var(--teal-lo); border: 1px solid rgba(0,207,200,.25); border-radius: 6px; padding: 4px 10px; white-space: nowrap; flex-shrink: 0; }
+    @media (max-width: 768px) { header { padding: 0 20px; } .brand-tag { display: none; } }
+    @media (max-width: 480px) { .auth-card { padding: 32px 22px; } }
   </style>
 </head>
 <body>
   <div class="pulse-bar"></div>
-
   <header>
-    <a class="brand" href="dashboard.html">
+    <a class="brand" href="/dashboard">
       <span class="logo">AgentFlow</span>
       <span class="brand-tag">Hub</span>
     </a>
     <nav>
-      <a href="login.html" class="active">Login</a>
-      <a href="dashboard.html">Dashboard</a>
+      <a href="/login" class="active">Login</a>
+      <a href="/dashboard">Dashboard</a>
     </nav>
   </header>
 
@@ -209,43 +66,22 @@
     <div class="auth-card">
       <h2>Welcome back</h2>
       <p class="subtitle">Sign in to the AgentFlow Insurance Platform</p>
-
       <form id="login-form">
         <label for="email">Email address</label>
-        <input
-          data-testid="login-email"
-          id="email" name="email" type="email"
-          placeholder="agent@example.com"
-          autocomplete="email" required />
-
+        <input data-testid="login-email" id="email" type="email" placeholder="agent@example.com" autocomplete="email" required />
         <label for="password">Password</label>
-        <input
-          data-testid="login-password"
-          id="password" name="password" type="password"
-          placeholder="••••••••"
-          autocomplete="current-password" required />
-
+        <input data-testid="login-password" id="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
         <button data-testid="login-submit" type="submit">Sign in</button>
       </form>
-
       <div id="error-msg"></div>
-
       <div class="demo-section">
         <div class="demo-label">Demo accounts — click to fill</div>
-
         <div class="demo-user" data-email="agency-a@agentflow.dev" data-password="Test1234!">
-          <div class="demo-user-info">
-            <div class="demo-user-email">agency-a@agentflow.dev</div>
-            <div class="demo-user-role">Agency A · Test1234!</div>
-          </div>
+          <div><div class="demo-user-email">agency-a@agentflow.dev</div><div class="demo-user-role">Agency A · Test1234!</div></div>
           <span class="demo-use-btn">Use this</span>
         </div>
-
         <div class="demo-user" data-email="agency-b@agentflow.dev" data-password="Test1234!">
-          <div class="demo-user-info">
-            <div class="demo-user-email">agency-b@agentflow.dev</div>
-            <div class="demo-user-role">Agency B · Test1234!</div>
-          </div>
+          <div><div class="demo-user-email">agency-b@agentflow.dev</div><div class="demo-user-role">Agency B · Test1234!</div></div>
           <span class="demo-use-btn">Use this</span>
         </div>
       </div>
@@ -263,27 +99,18 @@
 
     document.getElementById('login-form').addEventListener('submit', async function(e) {
       e.preventDefault();
-      var btn      = document.querySelector('[data-testid="login-submit"]');
-      var email    = document.getElementById('email').value;
-      var password = document.getElementById('password').value;
-
+      var btn = document.querySelector('[data-testid="login-submit"]');
       btn.disabled = true;
       btn.textContent = 'Signing in…';
-
       try {
         var res = await fetch('/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+          }),
         });
-
-        var ct = (res.headers.get('content-type') || '');
-        if (!ct.includes('application/json')) {
-          // Server not running (GitHub Pages / demo env) — go straight to dashboard
-          window.location.href = 'dashboard.html';
-          return;
-        }
-
         if (res.ok) {
           window.location.href = '/dashboard';
         } else {
@@ -292,8 +119,9 @@
           btn.textContent = 'Sign in';
         }
       } catch (_) {
-        // Network error — demo mode
-        window.location.href = 'dashboard.html';
+        document.getElementById('error-msg').textContent = 'Cannot reach server. Is it running?';
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
       }
     });
   </script>

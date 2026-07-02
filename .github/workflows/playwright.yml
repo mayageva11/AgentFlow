@@ -6,15 +6,8 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
 jobs:
-  test-and-deploy:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -48,42 +41,10 @@ jobs:
           rm -rf allure-report
           npx allure generate allure-results -o allure-report
 
-      - name: Build GitHub Pages site
-        if: always()
-        run: |
-          mkdir -p gh-pages/report gh-pages/data
-          cp -r allure-report/. gh-pages/report/
-          cp src/pages/login.html     gh-pages/login.html
-          cp src/pages/dashboard.html gh-pages/dashboard.html
-          touch gh-pages/.nojekyll
-          printf '<meta http-equiv="refresh" content="0;url=report/index.html" />\n' > gh-pages/index.html
-          cat > gh-pages/data/dashboard.json << 'JSONEOF'
-          [
-            {"manufacturer":"מנורה מבטחים","month":"06-2025","category":"life","totalCommission":128400,"policyCount":87,"status":"processed"},
-            {"manufacturer":"הפניקס ביטוח","month":"06-2025","category":"health","totalCommission":94250,"policyCount":63,"status":"processed"},
-            {"manufacturer":"הראל ביטוח","month":"05-2025","category":"pension","totalCommission":211800,"policyCount":142,"status":"processed"},
-            {"manufacturer":"מגדל ביטוח","month":"05-2025","category":"property","totalCommission":67900,"policyCount":44,"status":"pending"},
-            {"manufacturer":"כלל ביטוח","month":"04-2025","category":"life","totalCommission":154600,"policyCount":103,"status":"processed"}
-          ]
-          JSONEOF
-
-      - name: Upload Allure artifact
+      - name: Upload Allure report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
-          path: gh-pages/report/
+          path: allure-report/
           retention-days: 30
-
-      - name: Deploy to gh-pages branch
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          cd gh-pages
-          git init
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "deploy: ${GITHUB_SHA::7}"
-          git push -f \
-            https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git \
-            HEAD:gh-pages
