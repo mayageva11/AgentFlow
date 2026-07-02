@@ -1,4 +1,4 @@
-# AgentFlow Hub — QA Automation Portfolio
+# AgentFlow Hub — QA Automation 
 
 End-to-end test suite for an insurance commission upload platform. Demonstrates the Testing Pyramid with mock-driven UI tests and API-level business logic validation.
 
