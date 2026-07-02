@@ -7,7 +7,7 @@ export class LoginPage {
   readonly errorMessage: Locator;
 
   constructor(private readonly page: Page) {
-    this.emailInput   = page.locator('[name="email"]');
+    this.emailInput    = page.locator('[name="email"]');
     this.passwordInput = page.locator('[name="password"]');
     this.submitButton  = page.locator('[type="submit"]');
     this.errorMessage  = page.locator('#error-msg');
@@ -17,9 +17,15 @@ export class LoginPage {
     await this.page.goto('/login');
   }
 
-  async login(email: string, password: string): Promise<void> {
+  async fillEmail(email: string): Promise<void> {
     await this.emailInput.fill(email);
+  }
+
+  async fillPassword(password: string): Promise<void> {
     await this.passwordInput.fill(password);
+  }
+
+  async clickSubmit(): Promise<void> {
     await this.submitButton.click();
   }
 

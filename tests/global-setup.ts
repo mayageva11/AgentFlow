@@ -1,16 +1,20 @@
 import { chromium, Page } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import { LoginPage } from './pages/LoginPage';
+
+const BASE_URL = 'http://127.0.0.1:4000';
 
 function ensureAuthDir(): void {
   fs.mkdirSync(path.join(process.cwd(), '.auth'), { recursive: true });
 }
 
 async function loginAs(page: Page, email: string): Promise<void> {
-  await page.goto('http://127.0.0.1:4000/login');
-  await page.fill('[name="email"]', email);
-  await page.fill('[name="password"]', 'Test1234!');
-  await page.click('[type="submit"]');
+  const loginPage = new LoginPage(page);
+  await page.goto(`${BASE_URL}/login`);
+  await loginPage.fillEmail(email);
+  await loginPage.fillPassword('Test1234!');
+  await loginPage.clickSubmit();
 }
 
 async function waitForDashboard(page: Page): Promise<void> {

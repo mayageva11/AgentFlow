@@ -14,6 +14,12 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:4000',
     trace: 'on-first-retry',
   },
+  webServer: {
+    command: 'npm run server',
+    url: 'http://127.0.0.1:4000/health',
+    reuseExistingServer: !process.env.CI,
+    timeout: 30_000,
+  },
   projects: [
     {
       name: 'Desktop Chrome',

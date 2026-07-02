@@ -11,10 +11,15 @@ test('create report under manufacturer — correct branch and category saved', a
   await downloadsPage.navigate();
 
   // Act
-  await downloadsPage.createReport(manufacturerId, 'South', 'Audit Q2', 'health');
+  await downloadsPage.fillReportManufacturerId(manufacturerId);
+  await downloadsPage.fillReportBranch('South');
+  await downloadsPage.fillReportName('Audit Q2');
+  await downloadsPage.fillReportCategory('health');
+  await downloadsPage.clickCreateReport();
 
   // Assert
-  await downloadsPage.assertReportCreated();
+  await expect(downloadsPage.reportResult).toContainText('Created');
+  await expect(downloadsPage.reportResult).toContainText('ID:');
 });
 
 test('download Excel template — file downloaded with correct headers', async ({ downloadsPage }) => {
@@ -22,7 +27,7 @@ test('download Excel template — file downloaded with correct headers', async (
   await downloadsPage.navigate();
 
   // Act
-  const download = await downloadsPage.downloadTemplate();
+  const download = await downloadsPage.clickDownloadTemplate();
   const filePath = await download.path();
 
   // Assert

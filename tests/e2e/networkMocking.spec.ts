@@ -24,8 +24,8 @@ test('page.route() mocks success — custom JSON renders in table without hittin
   await dashboardPage.navigate();
   await dashboardPage.waitForLoad();
 
-  // Assert — the mocked manufacturer name appears in the rendered table
-  await expect(page.locator('text=MOCK_TEST_ROW')).toBeVisible();
+  // Assert — the mocked manufacturer name appears as a row in the rendered table
+  await expect(dashboardPage.getRowLocator(MOCK_REPORT.manufacturer)).toBeVisible();
   await expect(dashboardPage.reportsTable).toBeVisible();
   await expect(dashboardPage.dashboardError).not.toBeVisible();
 });

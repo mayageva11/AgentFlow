@@ -32,6 +32,11 @@ export class DashboardPage {
     );
   }
 
+  /** Returns a locator scoped to the table row that contains the given manufacturer name. */
+  getRowLocator(manufacturer: string): Locator {
+    return this.reportsTable.locator('tr').filter({ hasText: manufacturer });
+  }
+
   async fitsViewport(): Promise<boolean> {
     return this.page.evaluate(() => document.body.scrollWidth <= window.innerWidth + 5);
   }

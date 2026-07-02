@@ -1,4 +1,4 @@
-import { Page, Locator, Download, expect } from '@playwright/test';
+import { Page, Locator, Download } from '@playwright/test';
 
 export class DownloadsPage {
   // Manufacturer section
@@ -47,31 +47,55 @@ export class DownloadsPage {
     await this.page.goto('/downloads');
   }
 
-  async createManufacturer(name: string, iconColor: string): Promise<void> {
+  // ── Manufacturer actions ────────────────────────────────────────────────────
+
+  async fillManufacturerName(name: string): Promise<void> {
     await this.manufacturerNameInput.fill(name);
-    await this.manufacturerColorInput.fill(iconColor);
+  }
+
+  async fillManufacturerColor(color: string): Promise<void> {
+    await this.manufacturerColorInput.fill(color);
+  }
+
+  async clickCreateManufacturer(): Promise<void> {
     await this.createManufacturerButton.click();
   }
 
-  async createReport(
-    manufacturerId: string,
-    branch: string,
-    name: string,
-    category: string,
-  ): Promise<void> {
-    await this.reportManufacturerIdInput.fill(manufacturerId);
+  // ── Report actions ──────────────────────────────────────────────────────────
+
+  async fillReportManufacturerId(id: string): Promise<void> {
+    await this.reportManufacturerIdInput.fill(id);
+  }
+
+  async fillReportBranch(branch: string): Promise<void> {
     await this.reportBranchInput.fill(branch);
+  }
+
+  async fillReportName(name: string): Promise<void> {
     await this.reportNameInput.fill(name);
+  }
+
+  async fillReportCategory(category: string): Promise<void> {
     await this.reportCategoryInput.fill(category);
+  }
+
+  async clickCreateReport(): Promise<void> {
     await this.createReportButton.click();
   }
 
-  async uploadExcelFile(filePath: string): Promise<void> {
+  // ── Upload actions ──────────────────────────────────────────────────────────
+
+  async setUploadFile(filePath: string): Promise<void> {
     await this.fileInput.setInputFiles(filePath);
+  }
+
+  async clickUpload(): Promise<void> {
     await this.uploadButton.click();
   }
 
-  async downloadTemplate(): Promise<Download> {
+  // ── Template actions ────────────────────────────────────────────────────────
+
+  async clickDownloadTemplate(): Promise<Download> {
     const [download] = await Promise.all([
       this.page.waitForEvent('download'),
       this.downloadTemplateButton.click(),
@@ -79,23 +103,7 @@ export class DownloadsPage {
     return download;
   }
 
-  async assertManufacturerCreated(): Promise<void> {
-    await expect(this.manufacturerResult).toContainText('Created');
-    await expect(this.manufacturerResult).toContainText('ID:');
-  }
-
-  async assertReportCreated(): Promise<void> {
-    await expect(this.reportResult).toContainText('Created');
-    await expect(this.reportResult).toContainText('ID:');
-  }
-
-  async assertUploadStatus(status: string): Promise<void> {
-    await expect(this.uploadResult).toContainText(status);
-  }
-
-  async assertUploadStatusNot(status: string): Promise<void> {
-    await expect(this.uploadResult).not.toContainText(status);
-  }
+  // ── Viewport ────────────────────────────────────────────────────────────────
 
   async fitsViewport(): Promise<boolean> {
     return this.page.evaluate(() => document.body.scrollWidth <= window.innerWidth + 5);

@@ -1,4 +1,4 @@
-name: CI
+name: Playwright CI
 
 on:
   push:
@@ -37,14 +37,7 @@ jobs:
       - name: Generate fixtures
         run: npm run generate:fixtures
 
-      - name: Start server
-        run: npm run server &
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-
-      - name: Wait for server
-        run: npx wait-on http://127.0.0.1:4000/health --timeout 30000
-
+      # webServer in playwright.config.ts manages server lifecycle automatically
       - name: Run tests
         run: npm test
         env:
@@ -57,7 +50,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
-      # allure@3.x (installed by allure-playwright) removed --clean; pre-delete output dir instead
+      # allure@3.x removed --clean; pre-delete the output directory instead
       - name: Generate Allure report
         if: always()
         run: |
