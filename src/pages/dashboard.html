@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentFlow — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0D1B2A;
+      --teal: #00D4D4;
+      --surface: #112233;
+      --border: #1e3448;
+      --text: #c8d8e8;
+      --muted: #6b8299;
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+
+    .pulse-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--teal);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; box-shadow: 0 0 4px var(--teal); }
+      50% { opacity: 1; box-shadow: 0 0 16px var(--teal), 0 0 32px var(--teal); }
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      color: var(--teal);
+      letter-spacing: 0.04em;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      margin-left: 24px;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--teal); }
+
+    main {
+      max-width: 960px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 10px 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    tbody tr:hover { background: var(--surface); }
+
+    td {
+      padding: 12px 16px;
+      color: var(--text);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .status-processed { background: rgba(0,212,212,0.12); color: var(--teal); }
+    .status-pending   { background: rgba(255,170,0,0.12); color: #ffaa00; }
+
+    #loading {
+      text-align: center;
+      color: var(--muted);
+      padding: 48px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="pulse-bar"></div>
+  <header>
+    <span class="logo">AgentFlow</span>
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/downloads">Downloads</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Commission Reports</h1>
+    <div id="loading">Loading reports…</div>
+    <table id="reports-table" style="display:none">
+      <thead>
+        <tr>
+          <th>Manufacturer</th>
+          <th>Month</th>
+          <th>Total Commission</th>
+          <th>Policy Count</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="reports-body"></tbody>
+    </table>
+  </main>
+  <script>
+    function formatCurrency(n) {
+      return '₪' + n.toLocaleString('he-IL');
+    }
+
+    function renderRow(report) {
+      return `<tr>
+        <td>${report.manufacturer}</td>
+        <td>${report.month}</td>
+        <td>${formatCurrency(report.totalCommission)}</td>
+        <td>${report.policyCount}</td>
+        <td><span class="status-badge status-${report.status}">${report.status}</span></td>
+      </tr>`;
+    }
+
+    async function loadReports() {
+      const res = await fetch('/api/dashboard');
+      const reports = await res.json();
+      document.getElementById('reports-body').innerHTML = reports.map(renderRow).join('');
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('reports-table').style.display = 'table';
+    }
+
+    loadReports();
+  </script>
+</body>
+</html>
