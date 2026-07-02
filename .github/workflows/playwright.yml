@@ -6,12 +6,21 @@ on:
   pull_request:
     branches: [main]
 
+# Permissions required for actions/deploy-pages OIDC token exchange
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deployment at a time; cancel any in-progress on new push
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
-  # ── Job 1: install, test, build ──────────────────────────────────────────
+  # ── Job 1: test, build, upload Pages artifact ─────────────────────────
   test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: Checkout
@@ -82,18 +91,11 @@ jobs:
         with:
           path: ./gh-pages
 
-  # ── Job 2: deploy to GitHub Pages (main branch only) ─────────────────────
+  # ── Job 2: deploy (main branch only) ──────────────────────────────────
   deploy:
     needs: test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
-    concurrency:
-      group: pages
-      cancel-in-progress: true
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
