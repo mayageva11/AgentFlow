@@ -1,0 +1,1 @@
+{"id":"119ad2a0e5a60d42f28a8909fd5747f5","fullName":"api/isolation.api.spec.ts:26:5","name":"agency B cannot create a report that references an agency A manufacturer","status":"passed","testResultsByEnv":{"default":"22cd2f550220f2955d2ea37bcb30d7d9"}}

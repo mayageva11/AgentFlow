@@ -1,0 +1,1 @@
+{"id":"6db61f05cb021ee09001948b262a8eac","fullName":"api/upload.api.spec.ts:28:5","name":"one bad row in otherwise valid file — entire file rejected with status 67","status":"passed","testResultsByEnv":{"default":"8da1e19545cd6ec572829a007402c7f2"}}
