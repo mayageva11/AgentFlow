@@ -1,15 +1,12 @@
-import { test, expect } from '@playwright/test';
+import { test } from '../fixtures/testBase';
 
-test('create manufacturer with name and iconColor — appears in UI', async ({ page }) => {
+test('create manufacturer with name and iconColor — appears in UI', async ({ downloadsPage }) => {
   // Arrange
-  await page.goto('/downloads');
+  await downloadsPage.navigate();
 
   // Act
-  await page.fill('#manufacturer-name', 'מנורה');
-  await page.fill('#manufacturer-color', '#1A73E8');
-  await page.click('#create-manufacturer-btn');
+  await downloadsPage.createManufacturer('מנורה', '#1A73E8');
 
   // Assert
-  await expect(page.locator('#manufacturer-result')).toContainText('Created');
-  await expect(page.locator('#manufacturer-result')).toContainText('ID:');
+  await downloadsPage.assertManufacturerCreated();
 });

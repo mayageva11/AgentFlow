@@ -1,36 +1,28 @@
-import { test, expect } from '@playwright/test';
 import * as XLSX from 'xlsx';
+import { test, expect } from '../fixtures/testBase';
 import { createManufacturer } from '../helpers/manufacturerHelper';
 
-test('create report under manufacturer — correct branch and category saved', async ({ page, request }) => {
+test('create report under manufacturer — correct branch and category saved', async ({ downloadsPage, api }) => {
   // Arrange
-  const { id: manufacturerId } = await createManufacturer(request, {
+  const { id: manufacturerId } = await createManufacturer(api, {
     name: 'Report Test Corp',
     iconColor: '#00AA88',
   });
-  await page.goto('/downloads');
+  await downloadsPage.navigate();
 
   // Act
-  await page.fill('#report-manufacturer-id', manufacturerId);
-  await page.fill('#report-branch', 'South');
-  await page.fill('#report-name', 'Audit Q2');
-  await page.fill('#report-category', 'health');
-  await page.click('#create-report-btn');
+  await downloadsPage.createReport(manufacturerId, 'South', 'Audit Q2', 'health');
 
   // Assert
-  await expect(page.locator('#report-result')).toContainText('Created');
-  await expect(page.locator('#report-result')).toContainText('ID:');
+  await downloadsPage.assertReportCreated();
 });
 
-test('download Excel template — file downloaded with correct headers', async ({ page }) => {
+test('download Excel template — file downloaded with correct headers', async ({ downloadsPage }) => {
   // Arrange
-  await page.goto('/downloads');
+  await downloadsPage.navigate();
 
   // Act
-  const [download] = await Promise.all([
-    page.waitForEvent('download'),
-    page.click('#download-template-btn'),
-  ]);
+  const download = await downloadsPage.downloadTemplate();
   const filePath = await download.path();
 
   // Assert

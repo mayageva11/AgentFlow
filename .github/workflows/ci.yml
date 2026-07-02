@@ -54,10 +54,11 @@ jobs:
       - name: Build GitHub Pages site
         if: always()
         run: |
-          mkdir -p gh-pages/report
+          # allure-report may be empty if generate failed; guard so Pages deploy always succeeds
+          mkdir -p gh-pages/report allure-report
           cp -r allure-report/. gh-pages/report/
-          cp src/pages/landing.html  gh-pages/index.html
-          cp src/pages/login.html    gh-pages/login.html
+          cp src/pages/landing.html   gh-pages/index.html
+          cp src/pages/login.html     gh-pages/login.html
           cp src/pages/dashboard.html gh-pages/dashboard.html
           cp src/pages/downloads.html gh-pages/downloads.html
 

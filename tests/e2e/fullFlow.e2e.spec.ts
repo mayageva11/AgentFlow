@@ -1,58 +1,55 @@
-import { test, expect } from '@playwright/test';
-import path from 'path';
+import { test } from '../fixtures/testBase';
 import { createManufacturer } from '../helpers/manufacturerHelper';
 import { createReport } from '../helpers/reportHelper';
 
-const FIXTURES = path.join(process.cwd(), 'fixtures');
-const fix = (name: string) => path.join(FIXTURES, name);
-
-test('happy path: create manufacturer, create report, upload valid file — status 50 shown in UI', async ({ page, request }) => {
+test('happy path: create manufacturer, create report, upload valid file — status 50 shown in UI', async ({
+  downloadsPage,
+  api,
+  getFixture,
+}) => {
   // Arrange
-  const { id: manufacturerId } = await createManufacturer(request, {
+  const { id: manufacturerId } = await createManufacturer(api, {
     name: 'FlowTest Corp',
     iconColor: '#00D4D4',
   });
-  await createReport(request, {
-    manufacturerId,
-    branch: 'North',
-    name: 'Q1 Report',
-    category: 'life',
-  });
-  await page.goto('/downloads');
+  await createReport(api, { manufacturerId, branch: 'North', name: 'Q1 Report', category: 'life' });
+  await downloadsPage.navigate();
 
   // Act
-  await page.setInputFiles('#upload-file', fix('valid-upload-e2e.xlsx'));
-  await page.click('#upload-btn');
+  await downloadsPage.uploadExcelFile(getFixture('valid-upload-e2e.xlsx'));
 
   // Assert
-  await expect(page.locator('#upload-result')).toContainText('50');
+  await downloadsPage.assertUploadStatus('50');
 });
 
-test('error path: upload invalid file — correct error status shown in UI', async ({ page }) => {
+test('error path: upload invalid file — correct error status shown in UI', async ({
+  downloadsPage,
+  getFixture,
+}) => {
   // Arrange
-  await page.goto('/downloads');
+  await downloadsPage.navigate();
 
   // Act
-  await page.setInputFiles('#upload-file', fix('invalid-empty-e2e.xlsx'));
-  await page.click('#upload-btn');
+  await downloadsPage.uploadExcelFile(getFixture('invalid-empty-e2e.xlsx'));
 
   // Assert
-  await expect(page.locator('#upload-result')).toContainText('61');
+  await downloadsPage.assertUploadStatus('61');
 });
 
-test('duplicate upload: upload same file twice — second upload rejected', async ({ page }) => {
+test('duplicate upload: upload same file twice — second upload rejected', async ({
+  downloadsPage,
+  getFixture,
+}) => {
   // Arrange
-  await page.goto('/downloads');
+  await downloadsPage.navigate();
 
   // Act — first upload
-  await page.setInputFiles('#upload-file', fix('valid-upload-dup.xlsx'));
-  await page.click('#upload-btn');
-  await expect(page.locator('#upload-result')).toContainText('50');
+  await downloadsPage.uploadExcelFile(getFixture('valid-upload-dup.xlsx'));
+  await downloadsPage.assertUploadStatus('50');
 
   // Act — second upload of the identical file
-  await page.setInputFiles('#upload-file', fix('valid-upload-dup.xlsx'));
-  await page.click('#upload-btn');
+  await downloadsPage.uploadExcelFile(getFixture('valid-upload-dup.xlsx'));
 
   // Assert
-  await expect(page.locator('#upload-result')).not.toContainText('50');
+  await downloadsPage.assertUploadStatusNot('50');
 });

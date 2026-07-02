@@ -1,50 +1,43 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/testBase';
 
-async function bodyFitsViewport(page: import('@playwright/test').Page): Promise<boolean> {
-  return page.evaluate(() => document.body.scrollWidth <= window.innerWidth + 5);
-}
-
-test('login page fits viewport — all form fields visible', async ({ page }) => {
+test('login page fits viewport — all form fields visible', async ({ loginPage }) => {
   // Arrange & Act
-  await page.goto('/login');
+  await loginPage.navigate();
 
   // Assert
-  expect(await bodyFitsViewport(page)).toBe(true);
-  await expect(page.locator('[name="email"]')).toBeVisible();
-  await expect(page.locator('[name="password"]')).toBeVisible();
-  await expect(page.locator('[type="submit"]')).toBeVisible();
+  expect(await loginPage.fitsViewport()).toBe(true);
+  await expect(loginPage.emailInput).toBeVisible();
+  await expect(loginPage.passwordInput).toBeVisible();
+  await expect(loginPage.submitButton).toBeVisible();
 });
 
-test('dashboard page fits viewport — header and content visible after load', async ({ page }) => {
+test('dashboard page fits viewport — header and content visible after load', async ({ dashboardPage }) => {
   // Arrange & Act
-  await page.goto('/dashboard');
-  await page.waitForFunction(
-    () => (document.getElementById('loading') as HTMLElement).style.display === 'none',
-    { timeout: 8000 }
-  );
+  await dashboardPage.navigate();
+  await dashboardPage.waitForLoad();
 
   // Assert
-  expect(await bodyFitsViewport(page)).toBe(true);
-  await expect(page.locator('.logo')).toBeVisible();
-  await expect(page.locator('nav')).toBeVisible();
-  await expect(page.locator('h1')).toBeVisible();
+  expect(await dashboardPage.fitsViewport()).toBe(true);
+  await expect(dashboardPage.logo).toBeVisible();
+  await expect(dashboardPage.nav).toBeVisible();
+  await expect(dashboardPage.heading).toBeVisible();
 });
 
-test('downloads page fits viewport — all three form sections visible', async ({ page }) => {
+test('downloads page fits viewport — all three form sections visible', async ({ downloadsPage }) => {
   // Arrange & Act
-  await page.goto('/downloads');
+  await downloadsPage.navigate();
 
   // Assert
-  expect(await bodyFitsViewport(page)).toBe(true);
-  await expect(page.locator('#manufacturer-name')).toBeVisible();
-  await expect(page.locator('#report-manufacturer-id')).toBeVisible();
-  await expect(page.locator('#upload-file')).toBeVisible();
+  expect(await downloadsPage.fitsViewport()).toBe(true);
+  await expect(downloadsPage.manufacturerNameInput).toBeVisible();
+  await expect(downloadsPage.reportManufacturerIdInput).toBeVisible();
+  await expect(downloadsPage.fileInput).toBeVisible();
 });
 
-test('nav links remain present in the DOM on any viewport', async ({ page }) => {
+test('nav links remain present in the DOM on any viewport', async ({ dashboardPage }) => {
   // Arrange & Act
-  await page.goto('/dashboard');
+  await dashboardPage.navigate();
 
   // Assert — navigation must have exactly two links regardless of viewport
-  await expect(page.locator('nav a')).toHaveCount(2);
+  await expect(dashboardPage.navLinks).toHaveCount(2);
 });
