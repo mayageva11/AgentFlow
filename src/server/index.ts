@@ -50,7 +50,8 @@ const DASHBOARD_DEMO = [
 
 app.get('/api/dashboard', (_req, res) => {
   const { commissionData } = require('./state') as typeof import('./state');
-  res.json(commissionData.length > 0 ? commissionData : DASHBOARD_DEMO);
+  // Real uploads appear on top; demo records always stay visible below them
+  res.json([...commissionData, ...DASHBOARD_DEMO]);
 });
 
 app.use('/api/manufacturer', manufacturerRouter);

@@ -43,7 +43,7 @@ Open your browser at:
 | Agency A | `agency-a@agentflow.dev` | `Test1234!` |
 | Agency B | `agency-b@agentflow.dev` | `Test1234!` |
 
-The dashboard shows 5 sample commission records immediately. After uploading a file via the API, it shows real data.
+The dashboard shows 5 sample commission records immediately. Records from your own uploads appear on top of them.
 
 ---
 
