@@ -1,6 +1,10 @@
-# AgentFlow Hub — QA Automation 
+# AgentFlow Hub — QA Automation
 
-End-to-end test suite for an insurance commission upload platform. Demonstrates the Testing Pyramid with mock-driven UI tests and API-level business logic validation.
+End-to-end test suite for an insurance commission upload platform. Demonstrates the Testing Pyramid with mock-driven UI tests, API contract tests, and real-server integration tests.
+
+| Login | Dashboard | Manual Import |
+|---|---|---|
+| ![Login](docs/screenshots/login.png) | ![Dashboard](docs/screenshots/dashboard.png) | ![Manual Import](docs/screenshots/import.png) |
 
 ---
 
@@ -30,6 +34,7 @@ Open your browser at:
 |---|---|
 | Login | http://localhost:4000/login |
 | Dashboard | http://localhost:4000/dashboard |
+| Manual Import | http://localhost:4000/import |
 
 **Demo credentials** (click either row on the login page to auto-fill):
 
@@ -67,19 +72,24 @@ npx allure open allure-report
 
 ## What the tests cover
 
-Every test uses `page.route()` to intercept API calls and inject controlled JSON from `tests/mockData.json`. The server never influences test outcomes — tests are deterministic and safe to run any number of times.
+The suite has three layers, each proving a different skill:
 
-`globalSetup` calls `POST /api/reset` before the suite starts; `globalTeardown` calls it again after. This wipes all in-memory state (manufacturers, reports, commission records, duplicate-hash registry) so the server is clean on every run.
+1. **Mock-driven tests** intercept API calls with `page.route()` and inject controlled JSON from `tests/mockData.json` — fully deterministic, would run unchanged against the real Aigent API.
+2. **Integration tests** hit the running Express server with real HTTP requests and the actual XLSX fixture files — the server's validators, status codes, and SHA-256 duplicate detection are exercised for real.
+3. **A true UI end-to-end flow** clicks through the Manual Import page against the real server, exactly as a user would.
+
+`globalSetup` calls `POST /api/reset` before the suite starts; `globalTeardown` calls it again after. This wipes all in-memory state (manufacturers, reports, commission records, duplicate-hash registry) so the suite is safe to run any number of times.
 
 ### E2E UI tests (`tests/e2e/`)
 
-| File | What it checks |
-|---|---|
-| `dashboard.ui.spec.ts` | Dashboard renders rows from mocked API · Error state shown on 500 · Agency B data does not leak into Agency A view |
-| `fullFlow.e2e.spec.ts` | **Full assignment flow:** create manufacturer → create report → upload (status 50) → commission record visible on dashboard · Upload rejected (67) → no record · Upload rejected (70) → no record |
-| `responsive.spec.ts` | Login + Dashboard fit on Mobile Safari · Tablet Chrome · Desktop Chrome |
+| File | Approach | What it checks |
+|---|---|---|
+| `manualImport.e2e.spec.ts` | **real server, no mocks** | True assignment flow through the UI: create manufacturer → create report → upload template (status 50) → record visible on dashboard · Empty file shows status 61 error |
+| `fullFlow.e2e.spec.ts` | mocked via `page.route()` | Same flow with controlled responses: success (50) renders record · rejections (67, 70) leave dashboard empty |
+| `dashboard.ui.spec.ts` | mocked via `page.route()` | Dashboard renders injected rows · Error state on 500 · Agency B data does not leak into Agency A view |
+| `responsive.spec.ts` | mocked via `page.route()` | Login + Dashboard fit on Mobile Safari · Tablet Chrome · Desktop Chrome |
 
-### API contract tests (`tests/api/`)
+### API contract tests (`tests/api/`) — mocked
 
 These test each API's contract via `page.evaluate()` (so `page.route()` intercepts the calls) and verify the exact response shape from `mockData.json`.
 
@@ -90,7 +100,16 @@ These test each API's contract via `page.evaluate()` (so `page.route()` intercep
 | `report.api.spec.ts` | Create returns `RPT-` ID · Foreign manufacturer returns 403 |
 | `isolation.api.spec.ts` | Agency B cannot read Agency A manufacturer · Agency B cannot create report for Agency A manufacturer |
 
-**27 tests across 4 projects:** Desktop Chrome · Mobile Safari · Tablet Chrome · Data Isolation Security
+### Integration tests (`tests/integration/`) — real server
+
+Real multipart uploads of the generated XLSX fixtures; nothing is intercepted.
+
+| File | What it checks |
+|---|---|
+| `upload.integration.spec.ts` | Real status codes for every fixture: 50 · 61 · 67 (missing field) · 67 (all-or-nothing) · 67 (invalid category) · 70 · Real SHA-256 duplicate rejection · Template XLSX has exactly `month, policy_id, category` headers |
+| `auth.integration.spec.ts` | Wrong password → 401 with no session cookie |
+
+**38 tests across 4 projects:** Desktop Chrome · Mobile Safari · Tablet Chrome · Data Isolation Security
 
 ---
 
@@ -102,7 +121,7 @@ These test each API's contract via `page.evaluate()` (so `page.route()` intercep
 - Duplicate detection is byte-level SHA-256 hashing. Two files with identical data but generated separately are treated as two distinct uploads.
 - Session cookies are in-memory only — restarting the server logs everyone out.
 - The dashboard shows records for the logged-in agency only. There is no cross-agency view.
-- The Excel template download UI (`GET /api/upload/template`) exists on the server but is not exercised by the mock UI tests because the assignment mock focuses on the upload and result flow.
+- The Excel template (`GET /api/upload/template`) is downloadable from the Manual Import page; an integration test verifies it contains exactly the three required column headers.
 
 ---
 
@@ -134,23 +153,31 @@ src/
   pages/
     login.html            Login page with demo credential cards
     dashboard.html        Commission ledger — fetches /api/dashboard
+    import.html           Manual Import — manufacturer, report, template upload
 
 tests/
-  api/
+  api/                    Mock-driven API contract tests
     upload.api.spec.ts    Status code + business rule tests
     manufacturer.api.spec.ts
     report.api.spec.ts
     isolation.api.spec.ts Multi-tenant security tests
+  integration/            Real-server tests — actual XLSX uploads, no mocks
+    upload.integration.spec.ts
+    auth.integration.spec.ts
   e2e/
-    dashboard.ui.spec.ts  Mock-driven dashboard rendering tests
-    responsive.spec.ts    Viewport tests (Mobile Safari, Tablet Chrome)
+    manualImport.e2e.spec.ts  True UI flow against real server
+    fullFlow.e2e.spec.ts      Mocked assignment flow
+    dashboard.ui.spec.ts      Mock-driven dashboard rendering tests
+    responsive.spec.ts        Viewport tests (Mobile Safari, Tablet Chrome)
   pages/
     LoginPage.ts          POM — data-testid locators
     DashboardPage.ts      POM — data-testid locators
+    ImportPage.ts         POM — data-testid locators
   fixtures/
     testBase.ts           Custom test fixture with DI page objects
   helpers/                manufacturerHelper, reportHelper, uploadHelper
-  global-setup.ts         Pre-authenticates both agency sessions
+  global-setup.ts         Resets server state + pre-authenticates both agencies
+  global-teardown.ts      Resets server state after the run
 
 fixtures/                 Generated XLSX files (9 files)
 scripts/
@@ -166,7 +193,7 @@ docs/
 Every push to `main` runs the full test suite and uploads the Allure report as an artifact. No deployment — tests only.
 
 ```
-push to main → install → generate fixtures → run 27 tests → allure report → upload artifact
+push to main → install → generate fixtures → run 38 tests → allure report → upload artifact
 ```
 
 Download the Allure report from the Actions tab → latest run → Artifacts → `allure-report`.

@@ -10,12 +10,12 @@ QA automation suite for the insurance commission upload flow. Tests cover the fu
 
 | ID | Scenario | Expected | Coverage |
 |----|----------|----------|----------|
-| P0-01 | Upload valid XLSX with correct fields and MM-YYYY month | Status 50 (success) | `upload.api.spec.ts` |
-| P0-02 | Upload XLSX with headers only, no rows | Status 61 (empty file) | `upload.api.spec.ts` |
-| P0-03 | Upload XLSX with missing `policy_id` field | Status 67 (bad format) | `upload.api.spec.ts` |
-| P0-04 | Upload XLSX with month format `YYYY/MM` instead of `MM-YYYY` | Status 70 (bad month) | `upload.api.spec.ts` |
+| P0-01 | Upload valid XLSX with correct fields and MM-YYYY month | Status 50 (success) | `upload.api.spec.ts` (mock), `upload.integration.spec.ts` (real) |
+| P0-02 | Upload XLSX with headers only, no rows | Status 61 (empty file) | `upload.api.spec.ts` (mock), `upload.integration.spec.ts` (real) |
+| P0-03 | Upload XLSX with missing `policy_id` field | Status 67 (bad format) | `upload.integration.spec.ts` |
+| P0-04 | Upload XLSX with month format `YYYY/MM` instead of `MM-YYYY` | Status 70 (bad month) | `upload.api.spec.ts` (mock), `upload.integration.spec.ts` (real) |
 | P0-05 | Login with valid credentials redirects to `/dashboard` | Redirect + session cookie | `global-setup.ts` |
-| P0-06 | Happy path: create manufacturer → create report → upload valid file | UI shows status 50 | `fullFlow.e2e.spec.ts` |
+| P0-06 | Happy path: create manufacturer → create report → upload valid file | UI shows status 50, record on dashboard | `manualImport.e2e.spec.ts` (real UI), `fullFlow.e2e.spec.ts` (mocked) |
 
 ---
 
@@ -23,18 +23,20 @@ QA automation suite for the insurance commission upload flow. Tests cover the fu
 
 | ID | Scenario | Expected | Coverage |
 |----|----------|----------|----------|
-| P1-01 | File with one bad row among valid rows — entire file rejected | Status 67 (all-or-nothing) | `upload.api.spec.ts` |
-| P1-02 | File with a row whose category is not in allowed set | Status 67 (bad format) | `upload.api.spec.ts` |
-| P1-03 | Upload same file twice (byte-identical) | Second upload returns status 67 | `upload.api.spec.ts` |
+| P1-01 | File with one bad row among valid rows — entire file rejected | Status 67 (all-or-nothing) | `upload.api.spec.ts` (mock), `upload.integration.spec.ts` (real) |
+| P1-02 | File with a row whose category is not in allowed set | Status 67 (bad format) | `upload.api.spec.ts` (mock), `upload.integration.spec.ts` (real) |
+| P1-03 | Upload same file twice (byte-identical) | Second upload returns status 67 | `upload.integration.spec.ts` (real SHA-256 detection) |
 | P1-04 | Manufacturer created by agency A not accessible by agency B | GET returns 404 | `isolation.api.spec.ts` |
-| P1-05 | Create manufacturer — ID appears in response with MFR- prefix | Creator sees ID | `manufacturer.api.spec.ts` |
-| P1-06 | Create report linked to manufacturer — response contains RPT- ID | Response contains ID | `report.api.spec.ts` |
-| P1-07 | Download Excel template — file contains correct column headers | Headers: month, policy_id, category | endpoint exists (`GET /api/upload/template`); no UI in mock |
-| P1-08 | Upload invalid file via UI — correct error code displayed | Error status shown in UI | `fullFlow.e2e.spec.ts` |
+| P1-05 | Create manufacturer — ID appears in response with MFR- prefix | Creator sees ID | `manufacturer.api.spec.ts`, `manualImport.e2e.spec.ts` (via UI) |
+| P1-06 | Create report linked to manufacturer — response contains RPT- ID | Response contains ID | `report.api.spec.ts`, `manualImport.e2e.spec.ts` (via UI) |
+| P1-07 | Download Excel template — file contains correct column headers | Headers: month, policy_id, category | `upload.integration.spec.ts` |
+| P1-08 | Upload invalid file via UI — correct error code displayed | Error status shown in UI | `manualImport.e2e.spec.ts` (real), `fullFlow.e2e.spec.ts` (mocked) |
 
 ---
 
 ## P2 — Edge cases, tested weekly
+
+These are documented for completeness; only P2-07 is automated (marked below). The rest are a deliberate scope decision for a few hours of work.
 
 | ID | Scenario | Expected |
 |----|----------|----------|
@@ -44,7 +46,7 @@ QA automation suite for the insurance commission upload flow. Tests cover the fu
 | P2-04 | Create manufacturer with empty `name` field | 400 Bad Request or validation error |
 | P2-05 | Create report with non-existent `manufacturerId` | Server accepts (validation deferred to business layer) |
 | P2-06 | Concurrent uploads of same file from two parallel requests | Exactly one succeeds (status 50), one rejected (status 67) |
-| P2-07 | Login with wrong password | 401, no session cookie set |
+| P2-07 | Login with wrong password — **automated** in `auth.integration.spec.ts` | 401, no session cookie set |
 | P2-08 | Login with SQL-injection-style email | 401, no crash |
 | P2-09 | Upload XLSX with formula injection in policy_id cell | Sanitized / status 50 if fields are otherwise valid |
 | P2-10 | Dashboard API call with no session cookie | Response returned (auth not enforced — future hardening) |

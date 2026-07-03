@@ -22,9 +22,9 @@ test('dashboard page fits viewport — header and table visible after load', asy
   await expect(dashboardPage.heading).toBeVisible();
 });
 
-test('nav contains exactly two links on all viewports', async ({
+test('nav contains exactly three links on all viewports', async ({
   dashboardPage
 }) => {
   await dashboardPage.navigate();
-  await expect(dashboardPage.navLinks).toHaveCount(2);
+  await expect(dashboardPage.navLinks).toHaveCount(3);
 });

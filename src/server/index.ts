@@ -26,6 +26,7 @@ app.post('/api/reset', (_req, res) => {
 
 app.get('/login',     (_req, res) => res.sendFile(path.join(PAGES, 'login.html')));
 app.get('/dashboard', (_req, res) => res.sendFile(path.join(PAGES, 'dashboard.html')));
+app.get('/import',    (_req, res) => res.sendFile(path.join(PAGES, 'import.html')));
 app.use(express.static(PAGES));
 
 app.post('/api/login', (req, res) => {

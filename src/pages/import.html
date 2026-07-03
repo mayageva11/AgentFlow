@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentFlow Hub — Manual Import</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0b1523; --surface: #111e30; --card: #16253a; --border: #1f3452;
+      --teal: #00cfc8; --teal-lo: rgba(0,207,200,.08);
+      --text: #ccdaec; --muted: #607a97;
+      --error-bg: rgba(248,113,113,.08); --error-fg: #f87171;
+      --ok-bg: rgba(52,211,153,.1); --ok-fg: #34d399;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    .pulse-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: var(--teal); z-index: 999; animation: pbar 2.4s ease-in-out infinite; }
+    @keyframes pbar { 0%,100% { opacity:.3; box-shadow: 0 0 6px var(--teal); } 50% { opacity:1; box-shadow: 0 0 20px var(--teal), 0 0 40px var(--teal); } }
+    header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 40px; background: rgba(11,21,35,.88); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+    .brand { display: flex; align-items: baseline; gap: 8px; text-decoration: none; }
+    .logo { font-family: 'JetBrains Mono', monospace; font-size: 16px; color: var(--teal); letter-spacing: .05em; }
+    .brand-tag { font-size: 11px; color: var(--muted); }
+    nav { display: flex; gap: 2px; }
+    nav a { font-size: 13px; color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 6px; transition: color .2s, background .2s; }
+    nav a:hover { color: var(--text); background: rgba(255,255,255,.04); }
+    nav a.active { color: var(--teal); font-weight: 600; }
+    main { flex: 1; max-width: 720px; width: 100%; margin: 0 auto; padding: 40px 40px 64px; }
+    .page-header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .page-header h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+    .page-header p { font-size: 13px; color: var(--muted); }
+    .step-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 20px; }
+    .step-title { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; margin-bottom: 18px; }
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--teal-lo); color: var(--teal); font-family: 'JetBrains Mono', monospace; font-size: 12px; flex-shrink: 0; }
+    label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+    input[type="text"], select { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 10px 14px; outline: none; margin-bottom: 16px; transition: border-color .2s; }
+    input:focus, select:focus { border-color: var(--teal); }
+    input[type="color"] { width: 48px; height: 38px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; padding: 4px; margin-bottom: 16px; }
+    input[type="file"] { width: 100%; color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+    input[type="file"]::file-selector-button { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 12px; padding: 8px 14px; margin-right: 12px; cursor: pointer; }
+    .field-row { display: flex; gap: 16px; align-items: flex-end; }
+    .field-row > div:first-child { flex: 1; }
+    button.action { background: var(--teal); color: #0b1523; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 11px 22px; cursor: pointer; transition: opacity .2s; }
+    button.action:hover { opacity: .88; }
+    button.action:disabled { opacity: .4; cursor: not-allowed; }
+    .result { margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; min-height: 18px; }
+    .result.ok    { color: var(--ok-fg); }
+    .result.error { color: var(--error-fg); }
+    .template-link { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--teal); text-decoration: none; margin-bottom: 18px; border: 1px solid rgba(0,207,200,.25); background: var(--teal-lo); border-radius: 6px; padding: 8px 14px; }
+    .template-link:hover { opacity: .85; }
+    @media (max-width: 768px) { header { padding: 0 20px; } .brand-tag { display: none; } main { padding: 24px 16px 48px; } }
+  </style>
+</head>
+<body>
+  <div class="pulse-bar"></div>
+  <header>
+    <a class="brand" href="/dashboard"><span class="logo">AgentFlow</span><span class="brand-tag">Hub</span></a>
+    <nav>
+      <a href="/login">Login</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/import" class="active">Manual Import</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1>Manual Report Import</h1>
+      <p>Create a custom manufacturer, open a report, and upload a filled Excel template</p>
+    </div>
+
+    <div class="step-card">
+      <div class="step-title"><span class="step-num">1</span> Create custom manufacturer</div>
+      <div class="field-row">
+        <div>
+          <label for="mfr-name">Manufacturer name</label>
+          <input data-testid="mfr-name" id="mfr-name" type="text" placeholder="e.g. Shomera Insurance" />
+        </div>
+        <div>
+          <label for="mfr-color">Icon color</label>
+          <input data-testid="mfr-color" id="mfr-color" type="color" value="#00cfc8" />
+        </div>
+      </div>
+      <button data-testid="mfr-submit" id="mfr-submit" class="action" type="button">Create manufacturer</button>
+      <div data-testid="mfr-result" id="mfr-result" class="result"></div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-title"><span class="step-num">2</span> Create report</div>
+      <label for="rpt-branch">Branch</label>
+      <select data-testid="rpt-branch" id="rpt-branch">
+        <option>Life &amp; Finance</option>
+        <option>Elementary</option>
+        <option>Travel</option>
+      </select>
+      <label for="rpt-name">Report name</label>
+      <input data-testid="rpt-name" id="rpt-name" type="text" placeholder="e.g. Q1 Commissions" />
+      <label for="rpt-category">Default category</label>
+      <select data-testid="rpt-category" id="rpt-category">
+        <option>life</option>
+        <option>health</option>
+        <option>pension</option>
+        <option>property</option>
+      </select>
+      <button data-testid="rpt-submit" id="rpt-submit" class="action" type="button" disabled>Create report</button>
+      <div data-testid="rpt-result" id="rpt-result" class="result"></div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-title"><span class="step-num">3</span> Upload filled template</div>
+      <a class="template-link" data-testid="template-link" href="/api/upload/template" download>⬇ Download Excel template</a>
+      <label for="file-input">Excel file (.xlsx)</label>
+      <input data-testid="file-input" id="file-input" type="file" accept=".xlsx" />
+      <button data-testid="upload-submit" id="upload-submit" class="action" type="button">Upload file</button>
+      <div data-testid="upload-result" id="upload-result" class="result"></div>
+    </div>
+  </main>
+
+  <script>
+    var STATUS_MESSAGES = {
+      50: 'Status 50 — Success, file processed',
+      61: 'Status 61 — Empty file (headers but no rows)',
+      67: 'Status 67 — Bad format (missing field, wrong category, or duplicate file)',
+      70: 'Status 70 — Bad month format (expected MM-YYYY)',
+    };
+    var createdManufacturer = null;
+
+    function setResult(id, text, ok) {
+      var el = document.getElementById(id);
+      el.textContent = text;
+      el.className = 'result ' + (ok ? 'ok' : 'error');
+    }
+
+    document.getElementById('mfr-submit').addEventListener('click', async function () {
+      var name = document.getElementById('mfr-name').value.trim();
+      if (!name) { setResult('mfr-result', 'Please enter a manufacturer name', false); return; }
+      try {
+        var res = await fetch('/api/manufacturer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name, iconColor: document.getElementById('mfr-color').value }),
+        });
+        if (res.status === 401) { setResult('mfr-result', 'Unauthorized — please log in first', false); return; }
+        var body = await res.json();
+        createdManufacturer = { id: body.id, name: name };
+        document.getElementById('rpt-submit').disabled = false;
+        setResult('mfr-result', 'Created: ' + body.id, true);
+      } catch (_) {
+        setResult('mfr-result', 'Cannot reach server', false);
+      }
+    });
+
+    document.getElementById('rpt-submit').addEventListener('click', async function () {
+      var name = document.getElementById('rpt-name').value.trim();
+      if (!name) { setResult('rpt-result', 'Please enter a report name', false); return; }
+      try {
+        var res = await fetch('/api/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            manufacturerId: createdManufacturer.id,
+            branch: document.getElementById('rpt-branch').value,
+            name: name,
+            category: document.getElementById('rpt-category').value,
+          }),
+        });
+        var body = await res.json();
+        if (!res.ok) { setResult('rpt-result', body.error || 'Request failed', false); return; }
+        setResult('rpt-result', 'Created: ' + body.id, true);
+      } catch (_) {
+        setResult('rpt-result', 'Cannot reach server', false);
+      }
+    });
+
+    document.getElementById('upload-submit').addEventListener('click', async function () {
+      var input = document.getElementById('file-input');
+      if (!input.files.length) { setResult('upload-result', 'Please choose an .xlsx file', false); return; }
+      var form = new FormData();
+      form.append('file', input.files[0]);
+      form.append('manufacturer', createdManufacturer ? createdManufacturer.name : 'Custom Upload');
+      try {
+        var res = await fetch('/api/upload', { method: 'POST', body: form });
+        var body = await res.json();
+        var msg = STATUS_MESSAGES[body.status] || ('Status ' + body.status);
+        setResult('upload-result', msg, body.status === 50);
+      } catch (_) {
+        setResult('upload-result', 'Cannot reach server', false);
+      }
+    });
+  </script>
+</body>
+</html>
